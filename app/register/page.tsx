@@ -10,9 +10,14 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // 🔥 FIX: fallback seguro para produção (Vercel + Railway)
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://connectbuy-backend-production.up.railway.app";
+
   const handleRegister = async () => {
     try {
-      const res = await fetch("http://localhost:3000/auth/register", {
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +38,6 @@ export default function Register() {
 
       alert("Conta criada com sucesso!");
       router.push("/login");
-
     } catch (error) {
       alert("Erro de conexão com o servidor");
       console.log(error);
@@ -42,9 +46,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow">
-
         <h1 className="text-2xl font-bold text-center mb-6">
           Criar Conta
         </h1>
@@ -78,9 +80,7 @@ export default function Register() {
         >
           Cadastrar
         </button>
-
       </div>
-
     </div>
   );
 }

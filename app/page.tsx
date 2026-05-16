@@ -9,10 +9,14 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<any[]>([]);
 
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://connectbuy-backend-production.up.railway.app";
+
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/products");
+        const res = await fetch(`${API_URL}/api/products`);
         const data = await res.json();
 
         const list =
@@ -23,7 +27,6 @@ export default function Home() {
               : [];
 
         setProducts(list);
-
       } catch (error) {
         console.log("Erro ao carregar produtos:", error);
         setProducts([]);
@@ -41,7 +44,6 @@ export default function Home() {
 
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
 
-          {/* LOGO */}
           <h1 className="text-xl font-bold shrink-0">
             <span className="text-blue-600">Connect</span>
             <span className="text-purple-600">Buy</span>
@@ -66,30 +68,20 @@ export default function Home() {
           {/* MENU DESKTOP */}
           <nav className="hidden md:flex gap-3 text-sm items-center">
 
-            {/* BOTÃO CÂMERA */}
-            <button
-              className="px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center shadow-sm hover:shadow-md"
-            >
+            <button className="px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center shadow-sm hover:shadow-md">
               <Camera size={20} strokeWidth={2.2} />
             </button>
 
-            <Link
-              className="px-3 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition"
-              href="/login"
-            >
+            <Link href="/login" className="px-3 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition">
               Entrar
             </Link>
 
-            <Link
-              className="px-3 py-2 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white transition"
-              href="/register"
-            >
+            <Link href="/register" className="px-3 py-2 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white transition">
               Cadastrar
             </Link>
 
           </nav>
 
-          {/* MENU HAMBURGUER */}
           <button
             className="md:hidden text-3xl text-purple-600"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -103,7 +95,6 @@ export default function Home() {
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-purple-200 px-4 pb-4 shadow-lg">
 
-            {/* SEARCH MOBILE */}
             <div className="mt-4 flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
 
               <input
@@ -119,28 +110,18 @@ export default function Home() {
 
             </div>
 
-            {/* LINKS MOBILE */}
             <div className="flex flex-col gap-3 mt-4">
 
-              {/* CAMERA */}
-              <button
-                className="w-full py-3 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center gap-2"
-              >
+              <button className="w-full py-3 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center gap-2">
                 <Camera size={20} strokeWidth={2.2} />
                 <span>Pesquisar por imagem</span>
               </button>
 
-              <Link
-                href="/login"
-                className="w-full text-center py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition"
-              >
+              <Link href="/login" className="w-full text-center py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition">
                 Entrar
               </Link>
 
-              <Link
-                href="/register"
-                className="w-full text-center py-3 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white transition"
-              >
+              <Link href="/register" className="w-full text-center py-3 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white transition">
                 Cadastrar
               </Link>
 
@@ -151,7 +132,7 @@ export default function Home() {
 
       </header>
 
-      {/* HERO */}
+      {/* HERO - FIX MOBILE VIDEO */}
       <section className="pt-20">
 
         <div className="relative h-[420px] md:h-[520px] overflow-hidden">
@@ -161,6 +142,8 @@ export default function Home() {
             loop
             muted
             playsInline
+            webkit-playsinline="true"
+            preload="auto"
             className="w-full h-full object-cover"
           >
             <source
@@ -200,7 +183,6 @@ export default function Home() {
               className="bg-white rounded-2xl shadow hover:shadow-2xl transition transform hover:scale-[1.02] overflow-hidden"
             >
 
-              {/* IMAGEM PRODUTO */}
               <div className="relative h-52 overflow-hidden">
 
                 <img
@@ -208,7 +190,6 @@ export default function Home() {
                   className="w-full h-full object-cover"
                 />
 
-                {/* 🟣 VENDEDOR COM AVATAR */}
                 <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-white/90 px-2 py-1 rounded-full shadow">
 
                   <img
@@ -224,7 +205,6 @@ export default function Home() {
 
               </div>
 
-              {/* INFO */}
               <div className="p-4">
 
                 <h4 className="font-semibold line-clamp-1">
