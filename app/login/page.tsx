@@ -19,34 +19,44 @@ export default function LoginPage() {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/auth/login", {
+      // 🔥 API PRODUÇÃO
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL ||
+        "https://connectbuy-backend-production.up.railway.app";
+
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
 
       const data = await res.json().catch(() => null);
 
       if (!res.ok || !data?.access_token) {
-        alert("Credenciais inválidas");
+        alert(data?.message || "Credenciais inválidas");
         return;
       }
 
       // 🔥 GUARDA TOKEN
       localStorage.setItem("token", data.access_token);
 
-      // 🔥 GUARDA USER (ESSENCIAL PARA PRODUCTS)
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // 🔥 GUARDA USER
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("userId", data.user.id);
+      }
 
-      // 🔥 opcional: guardar userId separado
-      localStorage.setItem("userId", data.user.id);
+      alert("Login realizado com sucesso!");
 
       router.push("/dashboard");
 
     } catch (error) {
-      console.error(error);
+      console.error("Erro login:", error);
       alert("Erro ao ligar ao servidor");
     } finally {
       setLoading(false);
@@ -54,7 +64,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 px-4">
 
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 w-full max-w-md">
 
@@ -87,7 +97,7 @@ export default function LoginPage() {
           disabled={loading}
           className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
             loading
-              ? "bg-gray-400"
+              ? "bg-gray-400 cursor-not-allowed"
               : "bg-white text-blue-600 hover:scale-105 hover:bg-gray-100 active:scale-95"
           }`}
         >
@@ -97,7 +107,7 @@ export default function LoginPage() {
         <p className="text-center text-white/70 mt-6 text-sm">
           Não tem conta?{" "}
           <span
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/register")}
             className="text-white font-semibold cursor-pointer hover:underline"
           >
             Criar conta
@@ -105,6 +115,7 @@ export default function LoginPage() {
         </p>
 
       </div>
+
     </div>
   );
 }
