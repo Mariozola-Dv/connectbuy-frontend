@@ -8,7 +8,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<any[]>([]);
-  const [videoError, setVideoError] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -39,26 +39,27 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  // 🔥 tentativa de forçar autoplay em alguns browsers
+  // 🔥 FORÇA AUTOPLAY (MOBILE FIX REAL)
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
 
-    const playVideo = async () => {
+    const play = async () => {
       try {
         await v.play();
       } catch (err) {
         console.log("Autoplay bloqueado:", err);
+        setVideoFailed(true);
       }
     };
 
-    playVideo();
+    play();
   }, []);
 
   return (
     <div className="min-h-screen bg-white">
 
-      {/* NAVBAR (inalterado) */}
+      {/* NAVBAR (igual) */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
 
@@ -74,7 +75,6 @@ export default function Home() {
               placeholder="Pesquisar produto (ex: iPhone, camisa, Nike...)"
               className="w-full px-4 py-2 outline-none"
             />
-
             <button className="px-4 h-full border-l border-purple-300 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center">
               <Search size={20} strokeWidth={2.2} />
             </button>
@@ -103,11 +103,12 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO - VÍDEO ROBUSTO (CORRIGIDO) */}
+      {/* HERO VIDEO ULTRA ROBUSTO */}
       <section className="pt-20">
         <div className="relative h-[420px] md:h-[520px] overflow-hidden bg-black">
 
-          {!videoError ? (
+          {/* VIDEO */}
+          {!videoFailed ? (
             <video
               ref={videoRef}
               autoPlay
@@ -116,7 +117,7 @@ export default function Home() {
               playsInline
               preload="metadata"
               className="w-full h-full object-cover"
-              onError={() => setVideoError(true)}
+              onError={() => setVideoFailed(true)}
             >
               <source
                 src="https://res.cloudinary.com/dbbqvgvrh/video/upload/v1777753077/a_procura_ce2n1m.mp4"
@@ -124,7 +125,7 @@ export default function Home() {
               />
             </video>
           ) : (
-            // 🔥 fallback caso vídeo não carregue no dispositivo
+            /* 🔥 fallback caso o telemóvel bloqueie vídeo */
             <img
               src="https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?auto=format&fit=crop&w=1600&q=60"
               className="w-full h-full object-cover"
@@ -132,6 +133,7 @@ export default function Home() {
           )}
 
           <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
+
             <h2 className="text-3xl md:text-5xl font-bold text-white">
               Compra. Vende. Conecta.
             </h2>
@@ -139,23 +141,26 @@ export default function Home() {
             <p className="text-white/80 mt-3 max-w-xl text-sm md:text-base">
               Pesquisa por texto ou imagem para conectar compradores e vendedores.
             </p>
-          </div>
 
+          </div>
         </div>
       </section>
 
-      {/* FEED (INALTERADO) */}
+      {/* FEED (SEM ALTERAÇÃO) */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
+
         <h3 className="text-lg font-semibold text-purple-700 border-l-4 border-purple-500 pl-2">
           Produtos em destaque
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+
           {products.map((p, index) => (
             <div
               key={p?.id || index}
               className="bg-white rounded-2xl shadow hover:shadow-2xl transition transform hover:scale-[1.02] overflow-hidden"
             >
+
               <div className="relative h-52 overflow-hidden">
 
                 <img
@@ -190,8 +195,10 @@ export default function Home() {
                   Conversar com vendedor
                 </button>
               </div>
+
             </div>
           ))}
+
         </div>
       </section>
 
