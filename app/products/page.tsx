@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { API_URL } from "@/lib/api";
 
 const CLOUD_NAME = "dbbqvgvrh";
 const UPLOAD_PRESET = "connectbuy";
@@ -39,7 +40,7 @@ export default function Product() {
     }
   };
 
-  // 📦 PUBLICAR PRODUTO (VERSÃO SEGURA)
+  // 📦 PUBLICAR PRODUTO (CORRIGIDO)
   const submit = async () => {
     if (!title || !price || !imageUrl) {
       alert("Preenche todos os campos!");
@@ -49,7 +50,6 @@ export default function Product() {
     setLoading(true);
 
     try {
-      // 🔥 PEGAR USER DO LOCALSTORAGE
       const userRaw = localStorage.getItem("user");
 
       if (!userRaw) {
@@ -73,7 +73,8 @@ export default function Product() {
         return;
       }
 
-      const res = await fetch("http://localhost:3000/api/products", {
+      // 🔥 USO CORRETO DA API CENTRALIZADA
+      const res = await fetch(`${API_URL}/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +84,7 @@ export default function Product() {
           price: Number(price),
           description,
           imageUrl,
-          userId: userId, // 🔥 ISSO RESOLVE O ERRO
+          userId,
         }),
       });
 
