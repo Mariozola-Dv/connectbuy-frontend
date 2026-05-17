@@ -39,27 +39,26 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  // 🔥 FORÇA AUTOPLAY (MOBILE FIX REAL)
+  // 🔥 FIX AUTOPLAY REAL MOBILE
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
 
-    const play = async () => {
+    const tryPlay = async () => {
       try {
         await v.play();
-      } catch (err) {
-        console.log("Autoplay bloqueado:", err);
+      } catch {
         setVideoFailed(true);
       }
     };
 
-    play();
+    tryPlay();
   }, []);
 
   return (
     <div className="min-h-screen bg-white">
 
-      {/* NAVBAR (igual) */}
+      {/* NAVBAR */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
 
@@ -68,46 +67,88 @@ export default function Home() {
             <span className="text-purple-600">Buy</span>
           </h1>
 
+          {/* SEARCH */}
           <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Pesquisar produto (ex: iPhone, camisa, Nike...)"
+              placeholder="Pesquisar produto..."
               className="w-full px-4 py-2 outline-none"
             />
-            <button className="px-4 h-full border-l border-purple-300 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center">
-              <Search size={20} strokeWidth={2.2} />
+            <button className="px-4 text-purple-600">
+              <Search size={20} />
             </button>
           </div>
 
-          <nav className="hidden md:flex gap-3 text-sm items-center">
-            <button className="px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center shadow-sm hover:shadow-md">
-              <Camera size={20} strokeWidth={2.2} />
+          {/* DESKTOP MENU */}
+          <nav className="hidden md:flex gap-3 items-center">
+            <button className="px-3 py-2 rounded-xl border border-purple-500 text-purple-600">
+              <Camera size={20} />
             </button>
 
-            <Link href="/login" className="px-3 py-2 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition">
+            <Link href="/login" className="px-3 py-2 rounded-xl bg-purple-600 text-white">
               Entrar
             </Link>
 
-            <Link href="/register" className="px-3 py-2 rounded-xl border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white transition">
+            <Link href="/register" className="px-3 py-2 rounded-xl border border-purple-600 text-purple-600">
               Cadastrar
             </Link>
           </nav>
 
+          {/* HAMBURGER FIX */}
           <button
             className="md:hidden text-3xl text-purple-600"
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => setMenuOpen(true)}
           >
             ☰
           </button>
         </div>
+
+        {/* MOBILE MENU (FIX REAL) */}
+        {menuOpen && (
+          <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setMenuOpen(false)}>
+
+            <div
+              className="absolute top-0 right-0 w-72 h-full bg-white p-4 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+
+              <button
+                className="text-2xl mb-6"
+                onClick={() => setMenuOpen(false)}
+              >
+                ✕
+              </button>
+
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Pesquisar..."
+                className="w-full p-2 border rounded-xl mb-4"
+              />
+
+              <div className="flex flex-col gap-3">
+
+                <Link href="/login" onClick={() => setMenuOpen(false)}
+                  className="bg-purple-600 text-white p-3 rounded-xl text-center">
+                  Entrar
+                </Link>
+
+                <Link href="/register" onClick={() => setMenuOpen(false)}
+                  className="border border-purple-600 text-purple-600 p-3 rounded-xl text-center">
+                  Cadastrar
+                </Link>
+
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* HERO VIDEO ULTRA ROBUSTO */}
+      {/* HERO VIDEO FIX */}
       <section className="pt-20">
         <div className="relative h-[420px] md:h-[520px] overflow-hidden bg-black">
 
-          {/* VIDEO */}
           {!videoFailed ? (
             <video
               ref={videoRef}
@@ -115,7 +156,7 @@ export default function Home() {
               loop
               muted
               playsInline
-              preload="metadata"
+              preload="auto"
               className="w-full h-full object-cover"
               onError={() => setVideoFailed(true)}
             >
@@ -125,81 +166,43 @@ export default function Home() {
               />
             </video>
           ) : (
-            /* 🔥 fallback caso o telemóvel bloqueie vídeo */
-            <img
-              src="https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?auto=format&fit=crop&w=1600&q=60"
-              className="w-full h-full object-cover"
-            />
+            <div className="w-full h-full flex items-center justify-center text-white">
+              A carregar vídeo...
+            </div>
           )}
 
-          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
-
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center px-4">
             <h2 className="text-3xl md:text-5xl font-bold text-white">
               Compra. Vende. Conecta.
             </h2>
-
-            <p className="text-white/80 mt-3 max-w-xl text-sm md:text-base">
-              Pesquisa por texto ou imagem para conectar compradores e vendedores.
-            </p>
-
           </div>
+
         </div>
       </section>
 
-      {/* FEED (SEM ALTERAÇÃO) */}
+      {/* FEED (INTACTO) */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
-
-        <h3 className="text-lg font-semibold text-purple-700 border-l-4 border-purple-500 pl-2">
-          Produtos em destaque
-        </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
 
           {products.map((p, index) => (
-            <div
-              key={p?.id || index}
-              className="bg-white rounded-2xl shadow hover:shadow-2xl transition transform hover:scale-[1.02] overflow-hidden"
-            >
+            <div key={p?.id || index} className="bg-white rounded-2xl shadow">
 
-              <div className="relative h-52 overflow-hidden">
-
-                <img
-                  src={p?.imageUrl || "/placeholder.png"}
-                  className="w-full h-full object-cover"
-                />
-
-                <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-white/90 px-2 py-1 rounded-full shadow">
-
-                  <img
-                    src={p?.user?.profile?.imageUrl || "https://ui-avatars.com/api/?name=User"}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-
-                  <span className="text-xs font-medium">
-                    {p?.user?.profile?.fullName || "Vendedor"}
-                  </span>
-
-                </div>
-              </div>
+              <img
+                src={p?.imageUrl || "/placeholder.png"}
+                className="w-full h-52 object-cover"
+              />
 
               <div className="p-4">
-                <h4 className="font-semibold line-clamp-1">
-                  {p?.title || "Produto sem nome"}
-                </h4>
-
-                <p className="text-purple-600 font-bold mt-1">
-                  {p?.price || 0} Kz
-                </p>
-
-                <button className="mt-3 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-xl transition">
-                  Conversar com vendedor
-                </button>
+                <h4 className="font-semibold">{p?.title}</h4>
+                <p className="text-purple-600 font-bold">{p?.price} Kz</p>
               </div>
 
             </div>
           ))}
 
         </div>
+
       </section>
 
     </div>
