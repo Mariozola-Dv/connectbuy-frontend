@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { API_URL } from "@/lib/api";
 
 const CLOUD_NAME = "dbbqvgvrh";
 const UPLOAD_PRESET = "connectbuy";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // usa centralizado
 
 export default function Product() {
   const [title, setTitle] = useState("");
@@ -58,7 +59,6 @@ export default function Product() {
       }
 
       let user;
-
       try {
         user = JSON.parse(userRaw);
       } catch {
@@ -73,8 +73,8 @@ export default function Product() {
         return;
       }
 
-      // 🔥 USO CORRETO DA API CENTRALIZADA
-      const res = await fetch(`${API_URL}/products`, {
+      // 🔥 CORREÇÃO CRÍTICA AQUI
+      const res = await fetch(`${API_URL}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +141,6 @@ export default function Product() {
           onChange={(e) => setDescription(e.target.value)}
         />
 
-        {/* UPLOAD */}
         <input
           type="file"
           accept="image/*"
