@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 
+import { API_URL } from "@/lib/api";
+
 type Profile = {
   fullName?: string;
   imageUrl?: string;
@@ -23,6 +25,7 @@ type Profile = {
   user?: {
     email?: string;
   };
+  email?: string; // 🔥 compatibilidade extra
 };
 
 export default function Dashboard() {
@@ -49,12 +52,23 @@ export default function Dashboard() {
         return;
       }
 
-      const res = await fetch("http://localhost:3000/profile", {
+      const res = await fetch(`${API_URL}/profile`, {
         headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
       });
 
       const data = await res.json();
-      setProfile(data || {});
+
+      // 🔥 CORREÇÃO SEGURA (NÃO QUEBRA DESIGN)
+      setProfile({
+        fullName: data.fullName,
+        imageUrl: data.imageUrl,
+        isSeller: data.isSeller,
+
+        user: {
+          email: data.user?.email || data.email || "",
+        },
+      });
     };
 
     load();
@@ -89,7 +103,6 @@ export default function Dashboard() {
   return (
     <div className={`h-screen flex overflow-hidden ${bg} ${text}`}>
 
-      {/* OVERLAY FIXO */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -97,7 +110,6 @@ export default function Dashboard() {
         />
       )}
 
-      {/* SIDEBAR TOTALMENTE FIXA */}
       <aside
         className={`
           fixed md:static z-50 h-full w-72 border-r ${border} ${sidebarBg}
@@ -107,7 +119,6 @@ export default function Dashboard() {
         `}
       >
 
-        {/* HEADER */}
         <div className={`p-6 border-b ${border} flex items-center justify-between`}>
           <div>
             <h1 className="text-xl font-bold">
@@ -116,15 +127,11 @@ export default function Dashboard() {
             <p className={`text-xs mt-1 ${soft}`}>Painel de Controlo</p>
           </div>
 
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="md:hidden"
-          >
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden">
             <X size={18} />
           </button>
         </div>
 
-        {/* MENU FIXO */}
         <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
           {allModules.map((m, i) => {
             const Icon = m.icon;
@@ -143,7 +150,6 @@ export default function Dashboard() {
           })}
         </nav>
 
-        {/* FOOTER FIXO */}
         <div className={`p-4 border-t ${border}`}>
 
           <div className="flex items-center gap-3 mb-3">
@@ -154,8 +160,13 @@ export default function Dashboard() {
             </div>
 
             <div>
-              <p className="text-sm font-semibold">{profile?.fullName}</p>
-              <p className={`text-xs ${soft}`}>{profile?.user?.email}</p>
+              <p className="text-sm font-semibold">
+                {profile?.fullName || "Utilizador"}
+              </p>
+
+              <p className={`text-xs ${soft}`}>
+                {profile?.user?.email || "sem email"}
+              </p>
             </div>
           </div>
 
@@ -169,16 +180,11 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* MAIN FIXO (SEM MOVIMENTO) */}
       <main className="flex-1 h-full overflow-y-auto p-5 md:p-10">
 
-        {/* TOP BAR FIXA */}
         <div className="flex items-center justify-between mb-8">
 
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="md:hidden"
-          >
+          <button onClick={() => setSidebarOpen(true)} className="md:hidden">
             <Menu />
           </button>
 
@@ -195,7 +201,6 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* HERO FIXO */}
         <div className={`${card} border ${border} p-6 md:p-8 rounded-2xl mb-8`}>
           <h2 className="text-xl md:text-2xl font-semibold">
             Seja bem-vindo,{" "}
@@ -207,24 +212,15 @@ export default function Dashboard() {
           <p className={`mt-1 ${soft}`}>
             Tudo está sincronizado e estável.
           </p>
-
-          {profile?.isSeller && (
-            <div className="mt-3 inline-flex px-3 py-1 rounded-full bg-[#a855f7]/10 text-[#a855f7] text-xs border border-[#a855f7]/20">
-              Modo vendedor ativo
-            </div>
-          )}
         </div>
 
-        {/* CARDS ULTRA ESTÁVEIS (SEM TREMER) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {allModules.map((m, i) => {
             const Icon = m.icon;
 
             return (
               <Link key={i} href={m.route}>
-                <div
-                  className={`${card} border ${border} rounded-2xl p-5 transition-all duration-200 hover:scale-[1.02] hover:border-[#a855f7]/30`}
-                >
+                <div className={`${card} border ${border} rounded-2xl p-5 hover:scale-[1.02] transition`}>
                   <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#a855f7]/10 text-[#a855f7] mb-3">
                     <Icon size={18} />
                   </div>
