@@ -62,13 +62,13 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
 
-      {/* 🌄 BACKGROUND IMAGE */}
+      {/* 🌄 BACKGROUND CONNECTBUY (NEUTRO, MARKETPLACE) */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?auto=format&fit=crop&w=1600&q=60"
+          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=60"
           className="w-full h-full object-cover"
+          alt="marketplace background"
         />
-        {/* 🌫 overlay roxo/escuro */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-purple-900/60 to-black/80" />
       </div>
 
