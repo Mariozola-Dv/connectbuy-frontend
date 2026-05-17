@@ -19,7 +19,6 @@ export default function LoginPage() {
     try {
       setLoading(true);
 
-      // 🔥 API PRODUÇÃO
       const API_URL =
         process.env.NEXT_PUBLIC_API_URL ||
         "https://connectbuy-backend-production.up.railway.app";
@@ -42,17 +41,14 @@ export default function LoginPage() {
         return;
       }
 
-      // 🔥 GUARDA TOKEN
       localStorage.setItem("token", data.access_token);
 
-      // 🔥 GUARDA USER
       if (data.user) {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("userId", data.user.id);
       }
 
       alert("Login realizado com sucesso!");
-
       router.push("/dashboard");
 
     } catch (error) {
@@ -64,11 +60,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 px-4">
+    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
 
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl p-8 w-full max-w-md">
+      {/* 🌄 BACKGROUND IMAGE */}
+      <div className="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?auto=format&fit=crop&w=1600&q=60"
+          className="w-full h-full object-cover"
+        />
+        {/* 🌫 overlay roxo/escuro */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-purple-900/60 to-black/80" />
+      </div>
 
-        <h1 className="text-3xl font-bold text-center text-white mb-2">
+      {/* FORM */}
+      <div className="relative w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
+
+        <h1 className="text-3xl font-bold text-white text-center mb-2">
           ConnectBuy
         </h1>
 
@@ -79,7 +86,7 @@ export default function LoginPage() {
         <input
           type="email"
           placeholder="Email"
-          className="w-full mb-3 p-3 rounded-xl bg-white/20 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-white"
+          className="w-full mb-3 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/70 border border-white/20 outline-none focus:ring-2 focus:ring-purple-500 transition"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -87,7 +94,7 @@ export default function LoginPage() {
         <input
           type="password"
           placeholder="Senha"
-          className="w-full mb-5 p-3 rounded-xl bg-white/20 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-white"
+          className="w-full mb-5 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/70 border border-white/20 outline-none focus:ring-2 focus:ring-purple-500 transition"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -95,11 +102,11 @@ export default function LoginPage() {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
+          className={`w-full py-3 rounded-xl font-semibold transition transform ${
             loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-white text-blue-600 hover:scale-105 hover:bg-gray-100 active:scale-95"
-          }`}
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-purple-600 hover:bg-purple-700 hover:scale-[1.02] active:scale-95"
+          } text-white`}
         >
           {loading ? "Entrando..." : "Entrar"}
         </button>

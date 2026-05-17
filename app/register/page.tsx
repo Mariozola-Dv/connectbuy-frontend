@@ -10,7 +10,6 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // 🔥 FIX: fallback seguro para produção (Vercel + Railway)
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL ||
     "https://connectbuy-backend-production.up.railway.app";
@@ -45,21 +44,34 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow">
-        <h1 className="text-2xl font-bold text-center mb-6">
+    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+
+      {/* 🌄 BACKGROUND IMAGE */}
+      <div className="absolute inset-0">
+        <img
+          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=60"
+          className="w-full h-full object-cover"
+        />
+        {/* 🌫 overlay escuro + roxo */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-purple-900/60 to-black/80" />
+      </div>
+
+      {/* FORM */}
+      <div className="relative w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 shadow-2xl">
+
+        <h1 className="text-2xl font-bold text-white text-center mb-6">
           Criar Conta
         </h1>
 
         <input
-          className="w-full mb-3 px-3 py-2 border rounded-xl"
+          className="w-full mb-3 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/70 border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           placeholder="Nome"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
         <input
-          className="w-full mb-3 px-3 py-2 border rounded-xl"
+          className="w-full mb-3 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/70 border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           placeholder="Email"
           type="email"
           value={email}
@@ -67,7 +79,7 @@ export default function Register() {
         />
 
         <input
-          className="w-full mb-4 px-3 py-2 border rounded-xl"
+          className="w-full mb-5 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/70 border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           placeholder="Senha"
           type="password"
           value={password}
@@ -76,10 +88,11 @@ export default function Register() {
 
         <button
           onClick={handleRegister}
-          className="w-full bg-purple-600 text-white py-2 rounded-xl hover:bg-purple-700 transition"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold transition transform hover:scale-[1.02]"
         >
           Cadastrar
         </button>
+
       </div>
     </div>
   );
