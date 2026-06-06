@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   const COLORS = ["#6366f1", "#8b5cf6"];
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/admin/stats")
+    fetch(`process.env.NEXT_PUBLIC_API_URL/api/admin/stats`)
       .then(res => res.json())
       .then(data => setStats(data));
   }, []);

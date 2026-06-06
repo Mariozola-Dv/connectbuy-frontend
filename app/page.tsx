@@ -11,6 +11,7 @@ export default function Home() {
   const [videoReady, setVideoReady] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL ||
@@ -39,7 +40,6 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  // 🔥 FIX REAL PARA MOBILE (autoplay confiável)
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -48,16 +48,13 @@ export default function Home() {
       try {
         video.muted = true;
         video.playsInline = true;
-
         await video.play();
         setVideoReady(true);
       } catch (err) {
-        console.log("Video bloqueado no mobile:", err);
         setVideoReady(false);
       }
     };
 
-    // tenta várias vezes (mobile lento)
     const timer = setTimeout(() => {
       tryPlay();
     }, 300);
@@ -65,10 +62,35 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+  // ✅ ABRIR CÂMERA / GALERIA
+  const openCamera = () => {
+    imageInputRef.current?.click();
+  };
+
+  // ✅ QUANDO ESCOLHE IMAGEM
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    console.log("Imagem selecionada:", file);
+
+    // aqui depois vamos ligar IA + busca de produtos
+  };
+
   return (
     <div className="min-h-screen bg-white">
 
-      {/* NAVBAR (100% igual ao teu original) */}
+      {/* INPUT INVISÍVEL DA CÂMERA */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleImageSelect}
+        className="hidden"
+      />
+
+      {/* NAVBAR */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
 
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
@@ -95,7 +117,11 @@ export default function Home() {
 
           <nav className="hidden md:flex gap-3 text-sm items-center">
 
-            <button className="px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center shadow-sm hover:shadow-md">
+            {/* CAMERA DESKTOP */}
+            <button
+              onClick={openCamera}
+              className="px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center shadow-sm hover:shadow-md"
+            >
               <Camera size={20} strokeWidth={2.2} />
             </button>
 
@@ -118,7 +144,7 @@ export default function Home() {
 
         </div>
 
-        {/* MENU MOBILE (INTACTO) */}
+        {/* MENU MOBILE */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-purple-200 px-4 pb-4 shadow-lg">
 
@@ -139,7 +165,11 @@ export default function Home() {
 
             <div className="flex flex-col gap-3 mt-4">
 
-              <button className="w-full py-3 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center gap-2">
+              {/* CAMERA MOBILE */}
+              <button
+                onClick={openCamera}
+                className="w-full py-3 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center gap-2"
+              >
                 <Camera size={20} strokeWidth={2.2} />
                 <span>Pesquisar por imagem</span>
               </button>
@@ -159,9 +189,8 @@ export default function Home() {
 
       </header>
 
-      {/* HERO VIDEO FIXADO (NÃO MUDA DESIGN) */}
+      {/* HERO */}
       <section className="pt-20">
-
         <div className="relative h-[420px] md:h-[520px] overflow-hidden bg-black">
 
           <video
@@ -170,7 +199,6 @@ export default function Home() {
             loop
             muted
             playsInline
-            preload="metadata"
             className="w-full h-full object-cover"
             onLoadedData={() => setVideoReady(true)}
           >
@@ -180,7 +208,6 @@ export default function Home() {
             />
           </video>
 
-          {/* fallback SÓ se vídeo falhar MESMO */}
           {!videoReady && (
             <div className="absolute inset-0 bg-black flex items-center justify-center text-white">
               A carregar vídeo...
@@ -200,10 +227,9 @@ export default function Home() {
           </div>
 
         </div>
-
       </section>
 
-      {/* FEED (NÃO TOQUEI) */}
+      {/* FEED */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
         <h3 className="text-lg font-semibold text-purple-700 border-l-4 border-purple-500 pl-2">
@@ -224,19 +250,6 @@ export default function Home() {
                   src={p?.imageUrl || "/placeholder.png"}
                   className="w-full h-full object-cover"
                 />
-
-                <div className="absolute bottom-3 left-3 flex items-center gap-2 bg-white/90 px-2 py-1 rounded-full shadow">
-
-                  <img
-                    src={p?.user?.profile?.imageUrl || "https://ui-avatars.com/api/?name=User"}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-
-                  <span className="text-xs font-medium">
-                    {p?.user?.profile?.fullName || "Vendedor"}
-                  </span>
-
-                </div>
 
               </div>
 

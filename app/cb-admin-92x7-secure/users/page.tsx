@@ -28,7 +28,7 @@ export default function AdminUsersPage() {
 
   // 📥 LOAD USERS
   const loadUsers = async () => {
-    const res = await fetch("http://localhost:3000/api/admin/users");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`);
     const data = await res.json();
     setUsers(data);
   };
@@ -49,7 +49,7 @@ export default function AdminUsersPage() {
 
   // 🚫 BAN
   const banUser = async (id: string) => {
-    await fetch(`http://localhost:3000/api/admin/users/${id}/ban`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${id}/ban`, {
       method: "PATCH",
     });
     loadUsers();
@@ -57,7 +57,7 @@ export default function AdminUsersPage() {
 
   // ✅ UNBAN
   const unbanUser = async (id: string) => {
-    await fetch(`http://localhost:3000/api/admin/users/${id}/unban`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${id}/unban`, {
       method: "PATCH",
     });
     loadUsers();
@@ -65,7 +65,7 @@ export default function AdminUsersPage() {
 
   // 🗑 DELETE
   const deleteUser = async (id: string) => {
-    await fetch(`http://localhost:3000/api/admin/users/${id}`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${id}`, {
       method: "DELETE",
     });
     loadUsers();
