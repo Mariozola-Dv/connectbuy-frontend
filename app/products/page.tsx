@@ -6,7 +6,7 @@ import axios from "axios";
 const CLOUD_NAME = "dbbqvgvrh";
 const UPLOAD_PRESET = "connectbuy";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL; // usa centralizado
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Product() {
   const [title, setTitle] = useState("");
@@ -33,7 +33,6 @@ export default function Product() {
 
       return res.data.secure_url;
     } catch (error) {
-      console.log(error);
       alert("Erro ao enviar imagem");
       return "";
     } finally {
@@ -41,7 +40,7 @@ export default function Product() {
     }
   };
 
-  // 📦 PUBLICAR PRODUTO (CORRIGIDO)
+  // 📦 PUBLICAR
   const submit = async () => {
     if (!title || !price || !imageUrl) {
       alert("Preenche todos os campos!");
@@ -54,26 +53,13 @@ export default function Product() {
       const userRaw = localStorage.getItem("user");
 
       if (!userRaw) {
-        alert("Você precisa fazer login primeiro");
+        alert("Faça login primeiro");
         return;
       }
 
-      let user;
-      try {
-        user = JSON.parse(userRaw);
-      } catch {
-        alert("Sessão inválida. Faça login novamente");
-        return;
-      }
-
+      const user = JSON.parse(userRaw);
       const userId = user?.id;
 
-      if (!userId) {
-        alert("User inválido. Faça login novamente");
-        return;
-      }
-
-      // 🔥 CORREÇÃO CRÍTICA AQUI
       const res = await fetch(`${API_URL}/api/products`, {
         method: "POST",
         headers: {
@@ -91,87 +77,117 @@ export default function Product() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok) {
-        console.log(data);
-        alert(data?.message || "Erro ao publicar produto");
+        alert(data?.message || "Erro ao publicar");
         return;
       }
 
-      alert("🔥 Produto publicado com sucesso!");
+      alert("Produto publicado com sucesso!");
 
       setTitle("");
       setPrice("");
       setDescription("");
       setImageUrl("");
-
     } catch (error) {
-      console.log(error);
-      alert("Erro de conexão com servidor");
+      alert("Erro de conexão");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-100 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-purple-100 p-4">
 
-      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-8 border border-purple-100">
+      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-purple-100 overflow-hidden">
 
-        <h1 className="text-3xl font-bold text-center mb-6">
-          Publicar Produto
-        </h1>
+        {/* HEADER PREMIUM */}
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-center">
+          <h1 className="text-2xl font-bold text-white">
+            Publicar Produto
+          </h1>
+          <p className="text-white/80 text-sm mt-1">
+            Adicione um produto ao ConnectBuy
+          </p>
+        </div>
 
-        <input
-          className="w-full p-3 border rounded-xl mb-3"
-          placeholder="Nome do produto"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <div className="p-6 space-y-4">
 
-        <input
-          className="w-full p-3 border rounded-xl mb-3"
-          placeholder="Preço"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-
-        <textarea
-          className="w-full p-3 border rounded-xl mb-3 h-28"
-          placeholder="Descrição"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-
-        <input
-          type="file"
-          accept="image/*"
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-
-            const url = await uploadImage(file);
-            if (url) setImageUrl(url);
-          }}
-        />
-
-        {uploading && (
-          <p className="text-purple-600">A enviar imagem...</p>
-        )}
-
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            className="w-full h-48 object-cover rounded-xl mt-3"
+          {/* INPUTS PREMIUM */}
+          <input
+            className="w-full p-3 border-2 border-gray-200 rounded-xl text-black font-medium focus:border-purple-500 focus:outline-none"
+            placeholder="Nome do produto"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
-        )}
 
-        <button
-          onClick={submit}
-          disabled={loading}
-          className="mt-6 w-full bg-purple-600 text-white py-3 rounded-xl"
-        >
-          {loading ? "Publicando..." : "Publicar"}
-        </button>
+          <input
+            className="w-full p-3 border-2 border-gray-200 rounded-xl text-black font-medium focus:border-purple-500 focus:outline-none"
+            placeholder="Preço (Kz)"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+          />
 
+          <textarea
+            className="w-full p-3 border-2 border-gray-200 rounded-xl text-black font-medium h-28 focus:border-purple-500 focus:outline-none"
+            placeholder="Descrição do produto..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+
+          {/* UPLOAD AREA PREMIUM */}
+          <label className="cursor-pointer block">
+
+            <div className="border-2 border-dashed border-purple-300 rounded-2xl p-6 text-center hover:border-purple-500 transition bg-purple-50">
+
+              <div className="text-purple-600 text-4xl mb-2">📷</div>
+
+              <p className="font-semibold text-black">
+                Clique para adicionar imagem
+              </p>
+
+              <p className="text-sm text-gray-500 mt-1">
+                PNG, JPG ou JPEG
+              </p>
+
+              {uploading && (
+                <p className="text-purple-600 mt-2 font-medium">
+                  A enviar imagem...
+                </p>
+              )}
+
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                const url = await uploadImage(file);
+                if (url) setImageUrl(url);
+              }}
+            />
+          </label>
+
+          {/* PREVIEW */}
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              className="w-full h-52 object-cover rounded-2xl border"
+            />
+          )}
+
+          {/* BUTTON PREMIUM */}
+          <button
+            onClick={submit}
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition"
+          >
+            {loading ? "Publicando..." : "Publicar Produto"}
+          </button>
+
+        </div>
       </div>
     </div>
   );
