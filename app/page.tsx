@@ -15,6 +15,7 @@ import {
   Sparkles,
   Wrench,
   Package,
+  ShoppingCart,
 } from "lucide-react";
 
 export default function Home() {
@@ -23,6 +24,8 @@ export default function Home() {
   const [products, setProducts] = useState<any[]>([]);
   const [videoReady, setVideoReady] = useState(false);
 
+  const [cartCount, setCartCount] = useState(0); // 🔥 FUTURO CARRINHO
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -30,7 +33,6 @@ export default function Home() {
     process.env.NEXT_PUBLIC_API_URL ||
     "https://connectbuy-backend-production.up.railway.app";
 
-  // 📦 CATEGORIAS
   const categories = [
     { name: "Eletrónicos", icon: Smartphone },
     { name: "Veículos", icon: Car },
@@ -129,7 +131,6 @@ export default function Home() {
             <span className="text-purple-600">Buy</span>
           </h1>
 
-          {/* SEARCH DESKTOP */}
           <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
             <input
               value={search}
@@ -142,7 +143,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ACTIONS DESKTOP */}
+          {/* ACTIONS */}
           <nav className="hidden md:flex gap-3 items-center">
 
             <button
@@ -150,6 +151,17 @@ export default function Home() {
               className="px-3 py-2 border border-purple-500 text-purple-600 rounded-xl hover:bg-purple-600 hover:text-white transition"
             >
               <Camera size={20} />
+            </button>
+
+            {/* 🛒 CARRINHO (NOVO PREMIUM) */}
+            <button className="relative px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition">
+              <ShoppingCart size={20} />
+
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full animate-pulse">
+                  {cartCount}
+                </span>
+              )}
             </button>
 
             <Link href="/login" className="px-3 py-2 bg-purple-600 text-white rounded-xl">
@@ -208,9 +220,41 @@ export default function Home() {
         )}
       </header>
 
+      {/* 🔴 LIVE MARKETPLACE + CARRINHO STATUS */}
+      <div className="pt-24 flex justify-center">
+        <div className="flex items-center justify-between w-full max-w-xl px-4 py-2 rounded-full bg-purple-50 border border-purple-200 shadow-sm">
+
+          {/* LEFT - LIVE */}
+          <div className="flex items-center gap-3">
+
+            <div className="relative flex items-center justify-center">
+              <span className="absolute inline-flex h-3 w-3 rounded-full bg-purple-500 opacity-75 animate-ping"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-purple-600"></span>
+            </div>
+
+            <span className="text-sm font-semibold text-purple-700">
+              Live Marketplace • Online
+            </span>
+
+          </div>
+
+          {/* RIGHT - CART MINI STATUS */}
+          <div className="flex items-center gap-2 text-purple-700">
+
+            <ShoppingCart size={18} className="text-purple-600" />
+
+            <span className="text-sm font-bold">
+              {cartCount}
+            </span>
+
+          </div>
+
+        </div>
+      </div>
+
       {/* HERO */}
-      <section className="pt-20">
-        <div className="relative h-[420px] md:h-[520px] bg-black">
+      <section>
+        <div className="relative h-[420px] md:h-[520px] bg-black mt-4">
 
           <video
             ref={videoRef}
@@ -287,34 +331,7 @@ export default function Home() {
               <img
                 src={p?.imageUrl || "/placeholder.png"}
                 className="h-52 w-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/placeholder.png";
-                }}
               />
-
-              {/* 👤 VENDEDOR (CORRIGIDO PRISMA) */}
-              <div className="flex items-center gap-2 px-4 pt-3">
-                <img
-                  src={
-                    p?.user?.profile?.imageUrl ||
-                    "/avatar.png"
-                  }
-                  className="w-8 h-8 rounded-full object-cover border"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/avatar.png";
-                  }}
-                />
-                <span className="text-sm text-black font-medium">
-                  {p?.user?.profile?.fullName || "Vendedor"}
-                </span>
-              </div>
-
-              {/* 📄 DESCRIÇÃO */}
-              <div className="px-4 mt-1">
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {p?.description || "Sem descrição"}
-                </p>
-              </div>
 
               <div className="p-4">
                 <h4 className="font-semibold text-black">{p?.title}</h4>
