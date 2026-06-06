@@ -110,7 +110,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* CAMERA INPUT */}
+      {/* INPUT CAMERA */}
       <input
         ref={imageInputRef}
         type="file"
@@ -129,8 +129,8 @@ export default function Home() {
             <span className="text-purple-600">Buy</span>
           </h1>
 
-          {/* SEARCH */}
-          <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden">
+          {/* SEARCH DESKTOP */}
+          <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -142,7 +142,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ACTIONS */}
+          {/* ACTIONS DESKTOP */}
           <nav className="hidden md:flex gap-3 items-center">
 
             <button
@@ -173,9 +173,9 @@ export default function Home() {
 
         {/* MOBILE MENU */}
         {menuOpen && (
-          <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
+          <div className="md:hidden bg-purple-50 border-t border-purple-300 px-4 pb-4">
 
-            <div className="flex border rounded-xl mt-4 bg-white">
+            <div className="flex border border-purple-400 rounded-xl mt-4 bg-white">
               <input
                 className="w-full px-4 py-2 outline-none text-black"
                 placeholder="Pesquisar..."
@@ -187,7 +187,7 @@ export default function Home() {
 
             <div className="flex flex-col gap-3 mt-4">
 
-              {/* CAMERA IGUAL DESKTOP */}
+              {/* MESMO ÍCONE DO DESKTOP */}
               <button
                 onClick={openCamera}
                 className="flex items-center justify-center gap-2 py-3 border border-purple-500 text-purple-600 rounded-xl bg-white"
@@ -245,7 +245,7 @@ export default function Home() {
       {/* CATEGORIAS */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
-        <h3 className="text-xl font-bold text-purple-800 mb-6">
+        <h3 className="text-xl font-bold text-black mb-6">
           Categorias
         </h3>
 
@@ -263,12 +263,14 @@ export default function Home() {
                   <Icon className="text-purple-700 group-hover:text-white" />
                 </div>
 
+                {/* 🔥 TEXTO MAIS VISÍVEL */}
                 <span className="text-sm font-semibold text-black group-hover:text-purple-700">
                   {cat.name}
                 </span>
               </button>
             );
           })}
+
         </div>
       </section>
 
@@ -287,6 +289,9 @@ export default function Home() {
               <img
                 src={p?.imageUrl || "/placeholder.png"}
                 className="h-52 w-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder.png";
+                }}
               />
 
               {/* 👤 VENDEDOR */}
@@ -294,6 +299,9 @@ export default function Home() {
                 <img
                   src={p?.user?.avatar || "/avatar.png"}
                   className="w-8 h-8 rounded-full object-cover border"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/avatar.png";
+                  }}
                 />
                 <span className="text-sm text-black font-medium">
                   {p?.user?.name || "Vendedor"}
