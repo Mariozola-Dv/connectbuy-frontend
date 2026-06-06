@@ -147,7 +147,7 @@ export default function Home() {
 
             <button
               onClick={openCamera}
-              className="px-3 py-2 border border-purple-500 text-purple-600 rounded-xl hover:bg-purple-600 hover:text-white"
+              className="px-3 py-2 border border-purple-500 text-purple-600 rounded-xl hover:bg-purple-600 hover:text-white transition"
             >
               <Camera size={20} />
             </button>
@@ -173,7 +173,7 @@ export default function Home() {
 
         {/* MOBILE MENU */}
         {menuOpen && (
-          <div className="md:hidden bg-purple-50 border-t border-purple-300 px-4 pb-4">
+          <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
 
             <div className="flex border border-purple-400 rounded-xl mt-4 bg-white">
               <input
@@ -187,7 +187,6 @@ export default function Home() {
 
             <div className="flex flex-col gap-3 mt-4">
 
-              {/* MESMO ÍCONE DO DESKTOP */}
               <button
                 onClick={openCamera}
                 className="flex items-center justify-center gap-2 py-3 border border-purple-500 text-purple-600 rounded-xl bg-white"
@@ -263,7 +262,6 @@ export default function Home() {
                   <Icon className="text-purple-700 group-hover:text-white" />
                 </div>
 
-                {/* 🔥 TEXTO MAIS VISÍVEL */}
                 <span className="text-sm font-semibold text-black group-hover:text-purple-700">
                   {cat.name}
                 </span>
@@ -294,17 +292,20 @@ export default function Home() {
                 }}
               />
 
-              {/* 👤 VENDEDOR */}
+              {/* 👤 VENDEDOR (CORRIGIDO PRISMA) */}
               <div className="flex items-center gap-2 px-4 pt-3">
                 <img
-                  src={p?.user?.avatar || "/avatar.png"}
+                  src={
+                    p?.user?.profile?.imageUrl ||
+                    "/avatar.png"
+                  }
                   className="w-8 h-8 rounded-full object-cover border"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = "/avatar.png";
                   }}
                 />
                 <span className="text-sm text-black font-medium">
-                  {p?.user?.name || "Vendedor"}
+                  {p?.user?.profile?.fullName || "Vendedor"}
                 </span>
               </div>
 
