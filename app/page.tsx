@@ -8,7 +8,7 @@ import {
   Smartphone,
   Car,
   Shirt,
-  House,
+  Home as House,
   Gamepad2,
   BookOpen,
   Dumbbell,
@@ -16,6 +16,10 @@ import {
   Wrench,
   Package,
   ShoppingCart,
+  Building2,
+  Laptop,
+  Sofa,
+  Apple,
 } from "lucide-react";
 
 export default function Home() {
@@ -32,17 +36,23 @@ export default function Home() {
     process.env.NEXT_PUBLIC_API_URL ||
     "https://connectbuy-backend-production.up.railway.app";
 
+  // 📦 CATEGORIAS COMPLETAS (RESTAURADAS + EXPANDIDAS)
   const categories = [
     { name: "Eletrónicos", icon: Smartphone },
+    { name: "Telemóveis", icon: Smartphone },
+    { name: "Computadores", icon: Laptop },
     { name: "Veículos", icon: Car },
     { name: "Moda", icon: Shirt },
     { name: "Casa", icon: House },
+    { name: "Imóveis", icon: Building2 },   // 🔥 RESTAURADO PRINCIPAL
+    { name: "Móveis", icon: Sofa },
     { name: "Gaming", icon: Gamepad2 },
     { name: "Educação", icon: BookOpen },
     { name: "Desporto", icon: Dumbbell },
     { name: "Beleza", icon: Sparkles },
     { name: "Ferramentas", icon: Wrench },
     { name: "Acessórios", icon: Package },
+    { name: "Alimentação", icon: Apple },
   ];
 
   const openCamera = () => {
@@ -116,13 +126,11 @@ export default function Home() {
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
-          {/* LOGO */}
           <h1 className="text-xl font-bold">
             <span className="text-blue-600">Connect</span>
             <span className="text-purple-600">Buy</span>
           </h1>
 
-          {/* SEARCH DESKTOP */}
           <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
             <input
               value={search}
@@ -135,7 +143,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ACTIONS DESKTOP */}
+          {/* ACTIONS */}
           <nav className="hidden md:flex gap-3 items-center">
 
             <button
@@ -164,7 +172,7 @@ export default function Home() {
 
           </nav>
 
-          {/* HAMBURGER MENU (RESTAURADO ORIGINAL) */}
+          {/* HAMBURGER RESTAURADO */}
           <button
             className="md:hidden text-3xl text-purple-600"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -174,11 +182,10 @@ export default function Home() {
 
         </div>
 
-        {/* MOBILE MENU COMPLETO (RESTAURADO) */}
+        {/* MOBILE MENU COMPLETO */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
 
-            {/* SEARCH MOBILE */}
             <div className="flex border border-purple-400 rounded-xl mt-4 bg-white">
               <input
                 className="w-full px-4 py-2 outline-none text-black"
@@ -189,7 +196,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* ACTIONS MOBILE */}
             <div className="flex flex-col gap-3 mt-4">
 
               <button
@@ -200,11 +206,9 @@ export default function Home() {
                 Pesquisar por imagem
               </button>
 
-              <button className="relative py-3 border border-purple-500 text-purple-600 rounded-xl">
-                <div className="flex items-center justify-center gap-2">
-                  <ShoppingCart size={20} />
-                  Carrinho ({cartCount})
-                </div>
+              <button className="py-3 border border-purple-500 text-purple-600 rounded-xl">
+                <ShoppingCart size={20} className="inline mr-2" />
+                Carrinho ({cartCount})
               </button>
 
               <Link href="/login" className="py-3 bg-purple-600 text-white rounded-xl text-center">
@@ -272,6 +276,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CATEGORIAS RESTAURADAS */}
+      <section className="max-w-6xl mx-auto px-4 mt-10">
+
+        <h3 className="text-xl font-bold text-black mb-6">
+          Categorias
+        </h3>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+
+          {categories.map((cat, i) => {
+            const Icon = cat.icon;
+
+            return (
+              <button
+                key={i}
+                className="group bg-white border border-purple-200 rounded-2xl p-5 flex flex-col items-center gap-3 hover:shadow-xl transition"
+              >
+                <div className="w-14 h-14 rounded-full bg-purple-100 border border-purple-300 flex items-center justify-center group-hover:bg-purple-600">
+                  <Icon className="text-purple-700 group-hover:text-white" />
+                </div>
+
+                <span className="text-sm font-semibold text-black group-hover:text-purple-700">
+                  {cat.name}
+                </span>
+              </button>
+            );
+          })}
+
+        </div>
+      </section>
+
       {/* FEED COMPLETO */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
@@ -289,20 +324,16 @@ export default function Home() {
                 className="h-52 w-full object-cover"
               />
 
-              {/* PERFIL VENDEDOR */}
               <div className="flex items-center gap-2 px-4 pt-3">
-
                 <img
                   src={p?.user?.profile?.imageUrl || "/avatar.png"}
                   className="w-8 h-8 rounded-full object-cover border"
                 />
-
                 <span className="text-sm font-medium text-black">
                   {p?.user?.profile?.fullName || "Vendedor"}
                 </span>
               </div>
 
-              {/* DESCRIÇÃO */}
               <div className="px-4 mt-1">
                 <p className="text-sm text-gray-600 line-clamp-2">
                   {p?.description || "Sem descrição"}
