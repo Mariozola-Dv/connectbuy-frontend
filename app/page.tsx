@@ -17,6 +17,48 @@ export default function Home() {
     process.env.NEXT_PUBLIC_API_URL ||
     "https://connectbuy-backend-production.up.railway.app";
 
+  // 📷 ABRIR CÂMERA / GALERIA
+  const openCamera = () => {
+    imageInputRef.current?.click();
+  };
+
+  // 📷 ENVIAR IMAGEM PARA BACKEND (VISION)
+  const handleImageSearch = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch(`${API_URL}/vision/search`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      console.log("🔥 Vision result:", data);
+
+      if (data?.products?.length > 0) {
+        setProducts(data.products);
+      } else {
+        alert("Nenhum produto encontrado");
+      }
+    } catch (error) {
+      console.error("Erro na visão:", error);
+      alert("Erro ao processar imagem");
+    }
+  };
+
+  // 📷 QUANDO ESCOLHE IMAGEM
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    console.log("Imagem selecionada:", file);
+
+    handleImageSearch(file);
+  };
+
+  // 📦 CARREGAR PRODUTOS
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -40,6 +82,7 @@ export default function Home() {
     loadProducts();
   }, []);
 
+  // 🎥 VIDEO AUTOPLAY FIX
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -50,7 +93,7 @@ export default function Home() {
         video.playsInline = true;
         await video.play();
         setVideoReady(true);
-      } catch (err) {
+      } catch {
         setVideoReady(false);
       }
     };
@@ -61,21 +104,6 @@ export default function Home() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // ✅ ABRIR CÂMERA / GALERIA
-  const openCamera = () => {
-    imageInputRef.current?.click();
-  };
-
-  // ✅ QUANDO ESCOLHE IMAGEM
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    console.log("Imagem selecionada:", file);
-
-    // aqui depois vamos ligar IA + busca de produtos
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -117,7 +145,6 @@ export default function Home() {
 
           <nav className="hidden md:flex gap-3 text-sm items-center">
 
-            {/* CAMERA DESKTOP */}
             <button
               onClick={openCamera}
               className="px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center shadow-sm hover:shadow-md"
@@ -165,7 +192,6 @@ export default function Home() {
 
             <div className="flex flex-col gap-3 mt-4">
 
-              {/* CAMERA MOBILE */}
               <button
                 onClick={openCamera}
                 className="w-full py-3 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition flex items-center justify-center gap-2"
@@ -191,6 +217,7 @@ export default function Home() {
 
       {/* HERO */}
       <section className="pt-20">
+
         <div className="relative h-[420px] md:h-[520px] overflow-hidden bg-black">
 
           <video
@@ -227,6 +254,7 @@ export default function Home() {
           </div>
 
         </div>
+
       </section>
 
       {/* FEED */}
