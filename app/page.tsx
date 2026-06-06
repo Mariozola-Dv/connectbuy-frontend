@@ -62,8 +62,6 @@ export default function Home() {
 
       if (data?.products?.length > 0) {
         setProducts(data.products);
-      } else {
-        alert("Nenhum produto encontrado");
       }
     } catch (error) {
       console.error(error);
@@ -82,11 +80,7 @@ export default function Home() {
         const res = await fetch(`${API_URL}/api/products`);
         const data = await res.json();
 
-        setProducts(
-          Array.isArray(data)
-            ? data
-            : data?.products || []
-        );
+        setProducts(Array.isArray(data) ? data : data?.products || []);
       } catch {
         setProducts([]);
       }
@@ -116,7 +110,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* INPUT CAMERA */}
+      {/* CAMERA INPUT */}
       <input
         ref={imageInputRef}
         type="file"
@@ -128,7 +122,6 @@ export default function Home() {
 
       {/* NAVBAR */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
-
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
           <h1 className="text-xl font-bold">
@@ -136,8 +129,8 @@ export default function Home() {
             <span className="text-purple-600">Buy</span>
           </h1>
 
-          {/* SEARCH DESKTOP */}
-          <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
+          {/* SEARCH */}
+          <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -149,7 +142,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ACTIONS DESKTOP */}
+          {/* ACTIONS */}
           <nav className="hidden md:flex gap-3 items-center">
 
             <button
@@ -180,9 +173,9 @@ export default function Home() {
 
         {/* MOBILE MENU */}
         {menuOpen && (
-          <div className="md:hidden bg-purple-50 border-t border-purple-300 px-4 pb-4">
+          <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
 
-            <div className="flex border border-purple-400 rounded-xl mt-4 bg-white">
+            <div className="flex border rounded-xl mt-4 bg-white">
               <input
                 className="w-full px-4 py-2 outline-none text-black"
                 placeholder="Pesquisar..."
@@ -194,7 +187,7 @@ export default function Home() {
 
             <div className="flex flex-col gap-3 mt-4">
 
-              {/* CAMERA IGUAL AO DESKTOP */}
+              {/* CAMERA IGUAL DESKTOP */}
               <button
                 onClick={openCamera}
                 className="flex items-center justify-center gap-2 py-3 border border-purple-500 text-purple-600 rounded-xl bg-white"
@@ -212,7 +205,6 @@ export default function Home() {
               </Link>
 
             </div>
-
           </div>
         )}
       </header>
@@ -277,7 +269,6 @@ export default function Home() {
               </button>
             );
           })}
-
         </div>
       </section>
 
@@ -293,7 +284,28 @@ export default function Home() {
           {products.map((p, i) => (
             <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
 
-              <img src={p?.imageUrl} className="h-52 w-full object-cover" />
+              <img
+                src={p?.imageUrl || "/placeholder.png"}
+                className="h-52 w-full object-cover"
+              />
+
+              {/* 👤 VENDEDOR */}
+              <div className="flex items-center gap-2 px-4 pt-3">
+                <img
+                  src={p?.user?.avatar || "/avatar.png"}
+                  className="w-8 h-8 rounded-full object-cover border"
+                />
+                <span className="text-sm text-black font-medium">
+                  {p?.user?.name || "Vendedor"}
+                </span>
+              </div>
+
+              {/* 📄 DESCRIÇÃO */}
+              <div className="px-4 mt-1">
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {p?.description || "Sem descrição"}
+                </p>
+              </div>
 
               <div className="p-4">
                 <h4 className="font-semibold text-black">{p?.title}</h4>
