@@ -30,7 +30,7 @@ export default function Home() {
     process.env.NEXT_PUBLIC_API_URL ||
     "https://connectbuy-backend-production.up.railway.app";
 
-  // 📷 CATEGORIAS (NOVO)
+  // 📦 CATEGORIAS
   const categories = [
     { name: "Eletrónicos", icon: Smartphone },
     { name: "Veículos", icon: Car },
@@ -44,12 +44,10 @@ export default function Home() {
     { name: "Acessórios", icon: Package },
   ];
 
-  // 📷 ABRIR CÂMERA / GALERIA
   const openCamera = () => {
     imageInputRef.current?.click();
   };
 
-  // 📷 ENVIAR IMAGEM PARA BACKEND (VISION)
   const handleImageSearch = async (file: File) => {
     try {
       const formData = new FormData();
@@ -62,56 +60,46 @@ export default function Home() {
 
       const data = await res.json();
 
-      console.log("🔥 Vision result:", data);
-
       if (data?.products?.length > 0) {
         setProducts(data.products);
       } else {
         alert("Nenhum produto encontrado");
       }
     } catch (error) {
-      console.error("Erro na visão:", error);
-      alert("Erro ao processar imagem");
+      console.error(error);
     }
   };
 
-  // 📷 SELEÇÃO DE IMAGEM
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     handleImageSearch(file);
   };
 
-  // 📦 CARREGAR PRODUTOS
   useEffect(() => {
-    const loadProducts = async () => {
+    const load = async () => {
       try {
         const res = await fetch(`${API_URL}/api/products`);
         const data = await res.json();
 
-        const list = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.products)
-          ? data.products
-          : [];
-
-        setProducts(list);
-      } catch (error) {
-        console.log("Erro ao carregar produtos:", error);
+        setProducts(
+          Array.isArray(data)
+            ? data
+            : data?.products || []
+        );
+      } catch {
         setProducts([]);
       }
     };
 
-    loadProducts();
+    load();
   }, []);
 
-  // 🎥 VIDEO FIX
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const tryPlay = async () => {
+    const play = async () => {
       try {
         video.muted = true;
         video.playsInline = true;
@@ -122,14 +110,13 @@ export default function Home() {
       }
     };
 
-    const timer = setTimeout(() => tryPlay(), 300);
-    return () => clearTimeout(timer);
+    setTimeout(play, 300);
   }, []);
 
   return (
     <div className="min-h-screen bg-white">
 
-      {/* INPUT CÂMERA */}
+      {/* INPUT CAMERA */}
       <input
         ref={imageInputRef}
         type="file"
@@ -141,25 +128,28 @@ export default function Home() {
 
       {/* NAVBAR */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
+
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
           <h1 className="text-xl font-bold">
             <span className="text-blue-600">Connect</span>
             <span className="text-purple-600">Buy</span>
           </h1>
 
-          <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden">
+          {/* SEARCH DESKTOP */}
+          <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Pesquisar produto..."
-              className="w-full px-4 py-2 outline-none"
+              className="w-full px-4 py-2 outline-none text-black"
             />
             <button className="px-4 text-purple-600 hover:bg-purple-600 hover:text-white">
               <Search size={20} />
             </button>
           </div>
 
+          {/* ACTIONS DESKTOP */}
           <nav className="hidden md:flex gap-3 items-center">
 
             <button
@@ -190,10 +180,13 @@ export default function Home() {
 
         {/* MOBILE MENU */}
         {menuOpen && (
-          <div className="md:hidden bg-white border-t px-4 pb-4">
+          <div className="md:hidden bg-purple-50 border-t border-purple-300 px-4 pb-4">
 
-            <div className="flex border rounded-xl mt-4">
-              <input className="w-full px-4 py-2 outline-none" placeholder="Pesquisar..." />
+            <div className="flex border border-purple-400 rounded-xl mt-4 bg-white">
+              <input
+                className="w-full px-4 py-2 outline-none text-black"
+                placeholder="Pesquisar..."
+              />
               <button className="px-4 text-purple-600">
                 <Search size={20} />
               </button>
@@ -201,8 +194,13 @@ export default function Home() {
 
             <div className="flex flex-col gap-3 mt-4">
 
-              <button onClick={openCamera} className="py-3 border border-purple-500 text-purple-600 rounded-xl">
-                📷 Pesquisar por imagem
+              {/* CAMERA IGUAL AO DESKTOP */}
+              <button
+                onClick={openCamera}
+                className="flex items-center justify-center gap-2 py-3 border border-purple-500 text-purple-600 rounded-xl bg-white"
+              >
+                <Camera size={20} />
+                Pesquisar por imagem
               </button>
 
               <Link href="/login" className="py-3 bg-purple-600 text-white rounded-xl text-center">
@@ -231,9 +229,7 @@ export default function Home() {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source
-              src="https://res.cloudinary.com/dbbqvgvrh/video/upload/v1777753077/a_procura_ce2n1m.mp4"
-            />
+            <source src="https://res.cloudinary.com/dbbqvgvrh/video/upload/v1777753077/a_procura_ce2n1m.mp4" />
           </video>
 
           {!videoReady && (
@@ -254,10 +250,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORIAS (NOVO) */}
+      {/* CATEGORIAS */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
-        <h3 className="text-xl font-bold text-purple-700 mb-6">
+        <h3 className="text-xl font-bold text-purple-800 mb-6">
           Categorias
         </h3>
 
@@ -269,13 +265,13 @@ export default function Home() {
             return (
               <button
                 key={i}
-                className="group bg-white border border-purple-200 rounded-2xl p-5 flex flex-col items-center gap-3 hover:shadow-xl hover:-translate-y-1 transition"
+                className="group bg-white border border-purple-200 rounded-2xl p-5 flex flex-col items-center gap-3 hover:shadow-xl transition"
               >
-                <div className="w-14 h-14 rounded-full bg-purple-100 border border-purple-300 flex items-center justify-center group-hover:bg-purple-600 group-hover:border-purple-600">
-                  <Icon className="text-purple-600 group-hover:text-white" />
+                <div className="w-14 h-14 rounded-full bg-purple-100 border border-purple-300 flex items-center justify-center group-hover:bg-purple-600">
+                  <Icon className="text-purple-700 group-hover:text-white" />
                 </div>
 
-                <span className="text-sm font-semibold group-hover:text-purple-700">
+                <span className="text-sm font-semibold text-black group-hover:text-purple-700">
                   {cat.name}
                 </span>
               </button>
@@ -294,13 +290,13 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
 
-          {products.map((p, index) => (
-            <div key={p?.id || index} className="bg-white rounded-2xl shadow overflow-hidden">
+          {products.map((p, i) => (
+            <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
 
-              <img src={p?.imageUrl || "/placeholder.png"} className="h-52 w-full object-cover" />
+              <img src={p?.imageUrl} className="h-52 w-full object-cover" />
 
               <div className="p-4">
-                <h4 className="font-semibold">{p?.title}</h4>
+                <h4 className="font-semibold text-black">{p?.title}</h4>
                 <p className="text-purple-600 font-bold">{p?.price} Kz</p>
 
                 <button className="mt-3 w-full bg-purple-600 text-white py-2 rounded-xl">
