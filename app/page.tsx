@@ -50,23 +50,16 @@ export default function Home() {
   };
 
   const handleImageSearch = async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
+    const formData = new FormData();
+    formData.append("image", file);
 
-      const res = await fetch(`${API_URL}/vision/search`, {
-        method: "POST",
-        body: formData,
-      });
+    const res = await fetch(`${API_URL}/vision/search`, {
+      method: "POST",
+      body: formData,
+    });
 
-      const data = await res.json();
-
-      if (data?.products?.length > 0) {
-        setProducts(data.products);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    const data = await res.json();
+    if (data?.products?.length > 0) setProducts(data.products);
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,13 +73,11 @@ export default function Home() {
       try {
         const res = await fetch(`${API_URL}/api/products`);
         const data = await res.json();
-
         setProducts(Array.isArray(data) ? data : data?.products || []);
       } catch {
         setProducts([]);
       }
     };
-
     load();
   }, []);
 
@@ -125,11 +116,13 @@ export default function Home() {
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
+          {/* LOGO */}
           <h1 className="text-xl font-bold">
             <span className="text-blue-600">Connect</span>
             <span className="text-purple-600">Buy</span>
           </h1>
 
+          {/* SEARCH DESKTOP */}
           <div className="flex-1 hidden md:flex items-center border border-purple-400 rounded-xl overflow-hidden bg-white">
             <input
               value={search}
@@ -142,7 +135,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ACTIONS */}
+          {/* ACTIONS DESKTOP */}
           <nav className="hidden md:flex gap-3 items-center">
 
             <button
@@ -152,10 +145,8 @@ export default function Home() {
               <Camera size={20} />
             </button>
 
-            {/* CART */}
             <button className="relative px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition">
               <ShoppingCart size={20} />
-
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full animate-pulse">
                   {cartCount}
@@ -172,7 +163,61 @@ export default function Home() {
             </Link>
 
           </nav>
+
+          {/* HAMBURGER MENU (RESTAURADO ORIGINAL) */}
+          <button
+            className="md:hidden text-3xl text-purple-600"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ☰
+          </button>
+
         </div>
+
+        {/* MOBILE MENU COMPLETO (RESTAURADO) */}
+        {menuOpen && (
+          <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
+
+            {/* SEARCH MOBILE */}
+            <div className="flex border border-purple-400 rounded-xl mt-4 bg-white">
+              <input
+                className="w-full px-4 py-2 outline-none text-black"
+                placeholder="Pesquisar..."
+              />
+              <button className="px-4 text-purple-600">
+                <Search size={20} />
+              </button>
+            </div>
+
+            {/* ACTIONS MOBILE */}
+            <div className="flex flex-col gap-3 mt-4">
+
+              <button
+                onClick={openCamera}
+                className="flex items-center justify-center gap-2 py-3 border border-purple-500 text-purple-600 rounded-xl bg-white"
+              >
+                <Camera size={20} />
+                Pesquisar por imagem
+              </button>
+
+              <button className="relative py-3 border border-purple-500 text-purple-600 rounded-xl">
+                <div className="flex items-center justify-center gap-2">
+                  <ShoppingCart size={20} />
+                  Carrinho ({cartCount})
+                </div>
+              </button>
+
+              <Link href="/login" className="py-3 bg-purple-600 text-white rounded-xl text-center">
+                Entrar
+              </Link>
+
+              <Link href="/register" className="py-3 border border-purple-600 text-purple-600 rounded-xl text-center">
+                Cadastrar
+              </Link>
+
+            </div>
+          </div>
+        )}
       </header>
 
       {/* LIVE STATUS */}
@@ -180,11 +225,7 @@ export default function Home() {
         <div className="flex items-center justify-between w-full max-w-xl px-4 py-2 rounded-full bg-purple-50 border border-purple-200 shadow-sm">
 
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <span className="absolute h-3 w-3 bg-purple-500 rounded-full animate-ping"></span>
-              <span className="relative h-2 w-2 bg-purple-600 rounded-full inline-block"></span>
-            </div>
-
+            <span className="h-2 w-2 bg-purple-600 rounded-full animate-ping"></span>
             <span className="text-sm font-semibold text-purple-700">
               Live Marketplace • Online
             </span>
@@ -231,38 +272,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORIAS */}
-      <section className="max-w-6xl mx-auto px-4 mt-10">
-
-        <h3 className="text-xl font-bold text-black mb-6">
-          Categorias
-        </h3>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-
-          {categories.map((cat, i) => {
-            const Icon = cat.icon;
-
-            return (
-              <button
-                key={i}
-                className="group bg-white border border-purple-200 rounded-2xl p-5 flex flex-col items-center gap-3 hover:shadow-xl transition"
-              >
-                <div className="w-14 h-14 rounded-full bg-purple-100 border border-purple-300 flex items-center justify-center group-hover:bg-purple-600">
-                  <Icon className="text-purple-700 group-hover:text-white" />
-                </div>
-
-                <span className="text-sm font-semibold text-black group-hover:text-purple-700">
-                  {cat.name}
-                </span>
-              </button>
-            );
-          })}
-
-        </div>
-      </section>
-
-      {/* FEED (RESTAURADO COMPLETO) */}
+      {/* FEED COMPLETO */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
         <h3 className="text-lg font-semibold text-purple-700 border-l-4 border-purple-500 pl-2">
@@ -274,24 +284,17 @@ export default function Home() {
           {products.map((p, i) => (
             <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
 
-              {/* IMAGEM PRODUTO */}
               <img
                 src={p?.imageUrl || "/placeholder.png"}
                 className="h-52 w-full object-cover"
               />
 
-              {/* 👤 VENDEDOR (RESTAURADO) */}
+              {/* PERFIL VENDEDOR */}
               <div className="flex items-center gap-2 px-4 pt-3">
 
                 <img
-                  src={
-                    p?.user?.profile?.imageUrl ||
-                    "/avatar.png"
-                  }
+                  src={p?.user?.profile?.imageUrl || "/avatar.png"}
                   className="w-8 h-8 rounded-full object-cover border"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "/avatar.png";
-                  }}
                 />
 
                 <span className="text-sm font-medium text-black">
@@ -299,14 +302,13 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* 📄 DESCRIÇÃO (RESTAURADA) */}
+              {/* DESCRIÇÃO */}
               <div className="px-4 mt-1">
                 <p className="text-sm text-gray-600 line-clamp-2">
                   {p?.description || "Sem descrição"}
                 </p>
               </div>
 
-              {/* PREÇO + AÇÃO */}
               <div className="p-4">
                 <h4 className="font-semibold text-black">{p?.title}</h4>
                 <p className="text-purple-600 font-bold">{p?.price} Kz</p>
