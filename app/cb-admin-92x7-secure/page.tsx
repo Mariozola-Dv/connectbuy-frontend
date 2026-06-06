@@ -12,7 +12,7 @@ import {
   Tooltip,
   PieChart,
   Pie,
-  Cell
+  Cell,
 } from "recharts";
 
 import {
@@ -23,8 +23,12 @@ import {
   AlertTriangle,
   Bell,
   Settings,
-  Search
+  Search,
 } from "lucide-react";
+
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://connectbuy-backend-production.up.railway.app";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ users: 0, products: 0 });
@@ -32,10 +36,20 @@ export default function AdminDashboard() {
 
   const COLORS = ["#6366f1", "#8b5cf6"];
 
+  // 🔥 FIX: URL correta + fallback seguro
   useEffect(() => {
-    fetch(`process.env.NEXT_PUBLIC_API_URL/api/admin/stats`)
-      .then(res => res.json())
-      .then(data => setStats(data));
+    const loadStats = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/stats`);
+        const data = await res.json();
+        setStats(data || { users: 0, products: 0 });
+      } catch (err) {
+        console.log("Erro stats admin:", err);
+        setStats({ users: 0, products: 0 });
+      }
+    };
+
+    loadStats();
   }, []);
 
   const crescimento = [
@@ -43,12 +57,12 @@ export default function AdminDashboard() {
     { dia: "Ter", users: 5 },
     { dia: "Qua", users: 8 },
     { dia: "Qui", users: 12 },
-    { dia: "Sex", users: stats.users }
+    { dia: "Sex", users: stats.users },
   ];
 
   const distribuicao = [
     { name: "Usuários", value: stats.users },
-    { name: "Produtos", value: stats.products }
+    { name: "Produtos", value: stats.products },
   ];
 
   return (
@@ -98,32 +112,12 @@ export default function AdminDashboard() {
             href="/cb-admin-92x7-secure/products"
           />
 
-          <MenuItem
-            icon={<CreditCard size={16} />}
-            label="Pagamentos"
-            href="#"
-          />
-
-          <MenuItem
-            icon={<AlertTriangle size={16} />}
-            label="Denúncias"
-            href="#"
-          />
-
-          <MenuItem
-            icon={<Bell size={16} />}
-            label="Notificações"
-            href="#"
-          />
-
-          <MenuItem
-            icon={<Settings size={16} />}
-            label="Configurações"
-            href="#"
-          />
+          <MenuItem icon={<CreditCard size={16} />} label="Pagamentos" href="#" />
+          <MenuItem icon={<AlertTriangle size={16} />} label="Denúncias" href="#" />
+          <MenuItem icon={<Bell size={16} />} label="Notificações" href="#" />
+          <MenuItem icon={<Settings size={16} />} label="Configurações" href="#" />
 
         </nav>
-
       </aside>
 
       {/* MAIN */}
@@ -132,10 +126,7 @@ export default function AdminDashboard() {
         <div className="flex justify-between items-center">
 
           <div>
-            <h2 className="text-3xl font-bold">
-              Painel de Controlo
-            </h2>
-
+            <h2 className="text-3xl font-bold">Painel de Controlo</h2>
             <p className="text-gray-400 text-sm">
               Estatísticas em tempo real da plataforma
             </p>
@@ -147,6 +138,7 @@ export default function AdminDashboard() {
 
         </div>
 
+        {/* CARDS */}
         <div className="grid md:grid-cols-3 gap-5">
 
           <Card title="Total de Utilizadores" value={stats.users} color="text-indigo-400" />
@@ -155,10 +147,10 @@ export default function AdminDashboard() {
 
         </div>
 
+        {/* GRÁFICOS */}
         <div className="grid md:grid-cols-2 gap-6">
 
           <div className="bg-white/5 p-5 rounded-2xl border border-white/10">
-
             <h3 className="mb-4 text-indigo-300 font-semibold">
               Crescimento de Utilizadores
             </h3>
@@ -167,23 +159,26 @@ export default function AdminDashboard() {
               <AreaChart data={crescimento}>
                 <defs>
                   <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                   </linearGradient>
                 </defs>
 
-                <XAxis dataKey="dia" />
-                <YAxis />
+                <XAxis dataKey="dia" stroke="#aaa" />
+                <YAxis stroke="#aaa" />
                 <Tooltip />
 
-                <Area type="monotone" dataKey="users" stroke="#6366f1" fill="url(#colorUv)" />
+                <Area
+                  type="monotone"
+                  dataKey="users"
+                  stroke="#6366f1"
+                  fill="url(#colorUv)"
+                />
               </AreaChart>
             </ResponsiveContainer>
-
           </div>
 
           <div className="bg-white/5 p-5 rounded-2xl border border-white/10">
-
             <h3 className="mb-4 text-purple-300 font-semibold">
               Distribuição do Sistema
             </h3>
@@ -197,13 +192,11 @@ export default function AdminDashboard() {
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
-
           </div>
 
         </div>
 
       </main>
-
     </div>
   );
 }
