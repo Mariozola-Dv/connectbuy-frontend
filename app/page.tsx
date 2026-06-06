@@ -23,8 +23,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<any[]>([]);
   const [videoReady, setVideoReady] = useState(false);
-
-  const [cartCount, setCartCount] = useState(0); // 🔥 FUTURO CARRINHO
+  const [cartCount, setCartCount] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -153,7 +152,7 @@ export default function Home() {
               <Camera size={20} />
             </button>
 
-            {/* 🛒 CARRINHO (NOVO PREMIUM) */}
+            {/* CART */}
             <button className="relative px-3 py-2 rounded-xl border border-purple-500 text-purple-600 hover:bg-purple-600 hover:text-white transition">
               <ShoppingCart size={20} />
 
@@ -173,80 +172,27 @@ export default function Home() {
             </Link>
 
           </nav>
-
-          <button
-            className="md:hidden text-3xl text-purple-600"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            ☰
-          </button>
-
         </div>
-
-        {/* MOBILE MENU */}
-        {menuOpen && (
-          <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
-
-            <div className="flex border border-purple-400 rounded-xl mt-4 bg-white">
-              <input
-                className="w-full px-4 py-2 outline-none text-black"
-                placeholder="Pesquisar..."
-              />
-              <button className="px-4 text-purple-600">
-                <Search size={20} />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-3 mt-4">
-
-              <button
-                onClick={openCamera}
-                className="flex items-center justify-center gap-2 py-3 border border-purple-500 text-purple-600 rounded-xl bg-white"
-              >
-                <Camera size={20} />
-                Pesquisar por imagem
-              </button>
-
-              <Link href="/login" className="py-3 bg-purple-600 text-white rounded-xl text-center">
-                Entrar
-              </Link>
-
-              <Link href="/register" className="py-3 border border-purple-600 text-purple-600 rounded-xl text-center">
-                Cadastrar
-              </Link>
-
-            </div>
-          </div>
-        )}
       </header>
 
-      {/* 🔴 LIVE MARKETPLACE + CARRINHO STATUS */}
+      {/* LIVE STATUS */}
       <div className="pt-24 flex justify-center">
         <div className="flex items-center justify-between w-full max-w-xl px-4 py-2 rounded-full bg-purple-50 border border-purple-200 shadow-sm">
 
-          {/* LEFT - LIVE */}
           <div className="flex items-center gap-3">
-
-            <div className="relative flex items-center justify-center">
-              <span className="absolute inline-flex h-3 w-3 rounded-full bg-purple-500 opacity-75 animate-ping"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-purple-600"></span>
+            <div className="relative">
+              <span className="absolute h-3 w-3 bg-purple-500 rounded-full animate-ping"></span>
+              <span className="relative h-2 w-2 bg-purple-600 rounded-full inline-block"></span>
             </div>
 
             <span className="text-sm font-semibold text-purple-700">
               Live Marketplace • Online
             </span>
-
           </div>
 
-          {/* RIGHT - CART MINI STATUS */}
           <div className="flex items-center gap-2 text-purple-700">
-
-            <ShoppingCart size={18} className="text-purple-600" />
-
-            <span className="text-sm font-bold">
-              {cartCount}
-            </span>
-
+            <ShoppingCart size={18} />
+            <span className="text-sm font-bold">{cartCount}</span>
           </div>
 
         </div>
@@ -316,7 +262,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEED */}
+      {/* FEED (RESTAURADO COMPLETO) */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
         <h3 className="text-lg font-semibold text-purple-700 border-l-4 border-purple-500 pl-2">
@@ -328,11 +274,39 @@ export default function Home() {
           {products.map((p, i) => (
             <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
 
+              {/* IMAGEM PRODUTO */}
               <img
                 src={p?.imageUrl || "/placeholder.png"}
                 className="h-52 w-full object-cover"
               />
 
+              {/* 👤 VENDEDOR (RESTAURADO) */}
+              <div className="flex items-center gap-2 px-4 pt-3">
+
+                <img
+                  src={
+                    p?.user?.profile?.imageUrl ||
+                    "/avatar.png"
+                  }
+                  className="w-8 h-8 rounded-full object-cover border"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/avatar.png";
+                  }}
+                />
+
+                <span className="text-sm font-medium text-black">
+                  {p?.user?.profile?.fullName || "Vendedor"}
+                </span>
+              </div>
+
+              {/* 📄 DESCRIÇÃO (RESTAURADA) */}
+              <div className="px-4 mt-1">
+                <p className="text-sm text-gray-600 line-clamp-2">
+                  {p?.description || "Sem descrição"}
+                </p>
+              </div>
+
+              {/* PREÇO + AÇÃO */}
               <div className="p-4">
                 <h4 className="font-semibold text-black">{p?.title}</h4>
                 <p className="text-purple-600 font-bold">{p?.price} Kz</p>
