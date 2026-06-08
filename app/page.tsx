@@ -29,6 +29,10 @@ export default function Home() {
   const [videoReady, setVideoReady] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
+  // 🔥 VISÃO IA STATES (NOVO — ADICIONADO SEM REMOVER NADA)
+  const [visionLoading, setVisionLoading] = useState(false);
+  const [visionStep, setVisionStep] = useState("idle");
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,7 +40,7 @@ export default function Home() {
     process.env.NEXT_PUBLIC_API_URL ||
     "https://connectbuy-backend-production.up.railway.app";
 
-  // 📦 CATEGORIAS COMPLETAS (RESTAURADAS + EXPANDIDAS)
+  // 📦 CATEGORIAS COMPLETAS (INALTERADO)
   const categories = [
     { name: "Eletrónicos", icon: Smartphone },
     { name: "Telemóveis", icon: Smartphone },
@@ -44,7 +48,7 @@ export default function Home() {
     { name: "Veículos", icon: Car },
     { name: "Moda", icon: Shirt },
     { name: "Casa", icon: House },
-    { name: "Imóveis", icon: Building2 },   // 🔥 RESTAURADO PRINCIPAL
+    { name: "Imóveis", icon: Building2 },
     { name: "Móveis", icon: Sofa },
     { name: "Gaming", icon: Gamepad2 },
     { name: "Educação", icon: BookOpen },
@@ -59,17 +63,42 @@ export default function Home() {
     imageInputRef.current?.click();
   };
 
+  // 🔥 FUNÇÃO MELHORADA (SEM MEXER NO TEU BACKEND)
   const handleImageSearch = async (file: File) => {
-    const formData = new FormData();
-    formData.append("image", file);
+    try {
+      setVisionLoading(true);
+      setVisionStep("uploading");
 
-    const res = await fetch(`${API_URL}/vision/search`, {
-      method: "POST",
-      body: formData,
-    });
+      const formData = new FormData();
+      formData.append("image", file);
 
-    const data = await res.json();
-    if (data?.products?.length > 0) setProducts(data.products);
+      // efeito leve de progressão
+      setTimeout(() => setVisionStep("analyzing"), 500);
+
+      const res = await fetch(`${API_URL}/vision/search`, {
+        method: "POST",
+        body: formData,
+      });
+
+      setVisionStep("matching");
+
+      const data = await res.json();
+
+      setProducts(Array.isArray(data?.products) ? data.products : []);
+
+      setVisionStep("done");
+
+      setTimeout(() => {
+        setVisionLoading(false);
+        setVisionStep("idle");
+      }, 600);
+
+    } catch (err) {
+      console.error("Vision error:", err);
+      setProducts([]);
+      setVisionLoading(false);
+      setVisionStep("idle");
+    }
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +107,7 @@ export default function Home() {
     handleImageSearch(file);
   };
 
+  // 🔥 LOAD PRODUCTS (INALTERADO)
   useEffect(() => {
     const load = async () => {
       try {
@@ -91,6 +121,7 @@ export default function Home() {
     load();
   }, []);
 
+  // 🔥 VIDEO (INALTERADO)
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -112,7 +143,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* INPUT CAMERA */}
+      {/* INPUT CAMERA (INALTERADO) */}
       <input
         ref={imageInputRef}
         type="file"
@@ -122,7 +153,27 @@ export default function Home() {
         className="hidden"
       />
 
-      {/* NAVBAR */}
+      {/* 🔥 OVERLAY IA (NOVO — NÃO REMOVE NADA) */}
+      {visionLoading && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
+
+          <div className="bg-white w-72 p-6 rounded-2xl text-center shadow-xl">
+
+            <div className="animate-spin h-10 w-10 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+
+            <p className="text-purple-700 font-semibold text-sm">
+              {visionStep === "uploading" && "A enviar imagem..."}
+              {visionStep === "analyzing" && "A analisar imagem..."}
+              {visionStep === "matching" && "A procurar produtos semelhantes..."}
+              {visionStep === "done" && "Resultados encontrados!"}
+            </p>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* NAVBAR (INALTERADO) */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
@@ -143,7 +194,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* ACTIONS */}
           <nav className="hidden md:flex gap-3 items-center">
 
             <button
@@ -172,7 +222,6 @@ export default function Home() {
 
           </nav>
 
-          {/* HAMBURGER RESTAURADO */}
           <button
             className="md:hidden text-3xl text-purple-600"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -182,7 +231,7 @@ export default function Home() {
 
         </div>
 
-        {/* MOBILE MENU COMPLETO */}
+        {/* MOBILE MENU (INALTERADO) */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
 
@@ -224,7 +273,7 @@ export default function Home() {
         )}
       </header>
 
-      {/* LIVE STATUS */}
+      {/* LIVE STATUS (INALTERADO) */}
       <div className="pt-24 flex justify-center">
         <div className="flex items-center justify-between w-full max-w-xl px-4 py-2 rounded-full bg-purple-50 border border-purple-200 shadow-sm">
 
@@ -243,7 +292,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* HERO */}
+      {/* HERO (INALTERADO) */}
       <section>
         <div className="relative h-[420px] md:h-[520px] bg-black mt-4">
 
@@ -276,7 +325,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORIAS RESTAURADAS */}
+      {/* CATEGORIAS (INALTERADO) */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
         <h3 className="text-xl font-bold text-black mb-6">
@@ -307,7 +356,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEED COMPLETO */}
+      {/* FEED (INALTERADO) */}
       <section className="max-w-6xl mx-auto px-4 mt-10">
 
         <h3 className="text-lg font-semibold text-purple-700 border-l-4 border-purple-500 pl-2">
