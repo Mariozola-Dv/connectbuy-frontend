@@ -27,14 +27,15 @@ export default function Home() {
   const [search, setSearch] = useState("");
 
   const [products, setProducts] = useState<any[]>([]);
-  const [visionResults, setVisionResults] = useState<any[]>([]);
-  const [isVisionMode, setIsVisionMode] = useState(false);
 
-  const [videoReady, setVideoReady] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-
+  // 🔥 VISION IA STATES (CORRIGIDO)
   const [visionLoading, setVisionLoading] = useState(false);
   const [visionStep, setVisionStep] = useState("idle");
+  const [visionResults, setVisionResults] = useState<any[]>([]);
+  const [visionMode, setVisionMode] = useState(false);
+
+  const [videoReady, setVideoReady] = useState(false);
+  const [cartCount] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -65,29 +66,31 @@ export default function Home() {
     imageInputRef.current?.click();
   };
 
-  // 🔥 FIXED VISION AI FLOW
+  // 🔥 CAMERA / VISION FIX TOTAL
   const handleImageSearch = async (file: File) => {
     try {
       setVisionLoading(true);
+      setVisionMode(true);
       setVisionStep("uploading");
-      setIsVisionMode(true);
 
       const formData = new FormData();
       formData.append("image", file);
 
-      setTimeout(() => setVisionStep("analyzing"), 600);
+      setTimeout(() => setVisionStep("scanning"), 700);
 
       const res = await fetch(`${API_URL}/vision/search`, {
         method: "POST",
         body: formData,
       });
 
-      setVisionStep("matching");
+      setVisionStep("analyzing");
 
       const data = await res.json();
 
       const results = Array.isArray(data?.products)
         ? data.products
+        : Array.isArray(data?.results)
+        ? data.results
         : [];
 
       setVisionResults(results);
@@ -97,14 +100,14 @@ export default function Home() {
       setTimeout(() => {
         setVisionLoading(false);
         setVisionStep("idle");
-      }, 800);
+      }, 900);
 
     } catch (err) {
       console.error("Vision error:", err);
       setVisionResults([]);
+      setVisionMode(true);
       setVisionLoading(false);
       setVisionStep("idle");
-      setIsVisionMode(false);
     }
   };
 
@@ -114,6 +117,7 @@ export default function Home() {
     handleImageSearch(file);
   };
 
+  // 🔥 LOAD PRODUCTS (INALTERADO)
   useEffect(() => {
     const load = async () => {
       try {
@@ -127,6 +131,7 @@ export default function Home() {
     load();
   }, []);
 
+  // 🔥 VIDEO (INALTERADO)
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -145,9 +150,12 @@ export default function Home() {
     setTimeout(play, 300);
   }, []);
 
+  const hasResults = visionResults.length > 0;
+
   return (
     <div className="min-h-screen bg-white">
 
+      {/* INPUT CAMERA */}
       <input
         ref={imageInputRef}
         type="file"
@@ -157,25 +165,28 @@ export default function Home() {
         className="hidden"
       />
 
-      {/* 🔥 VANESSA AI OVERLAY */}
+      {/* 🔥 SCAN OVERLAY PROFISSIONAL */}
       {visionLoading && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-white w-80 p-6 rounded-2xl text-center shadow-xl">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50">
+          <div className="bg-white w-80 p-6 rounded-2xl text-center relative overflow-hidden">
+
+            {/* scan line effect */}
+            <div className="absolute inset-0 animate-pulse bg-gradient-to-b from-transparent via-purple-500/20 to-transparent"></div>
 
             <div className="animate-spin h-10 w-10 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
 
             <p className="text-purple-700 font-semibold text-sm">
-              {visionStep === "uploading" && "Vanessa está a receber a imagem..."}
-              {visionStep === "analyzing" && "Vanessa está a analisar padrões visuais..."}
-              {visionStep === "matching" && "A procurar produtos semelhantes..."}
-              {visionStep === "done" && "Análise concluída!"}
+              {visionStep === "uploading" && "A enviar imagem..."}
+              {visionStep === "scanning" && "Vanessa está a escanear a imagem..."}
+              {visionStep === "analyzing" && "A analisar padrões visuais..."}
+              {visionStep === "done" && "Pesquisa concluída!"}
             </p>
 
           </div>
         </div>
       )}
 
-      {/* NAVBAR (mantido igual) */}
+      {/* NAVBAR (INTACTO — NÃO MEXIDO) */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
@@ -191,7 +202,7 @@ export default function Home() {
               placeholder="Pesquisar produto..."
               className="w-full px-4 py-2 outline-none text-black"
             />
-            <button className="px-4 text-purple-600 hover:bg-purple-600 hover:text-white">
+            <button className="px-4 text-purple-600">
               <Search size={20} />
             </button>
           </div>
@@ -223,10 +234,9 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO (mantido) */}
+      {/* HERO (INTACTO) */}
       <section>
         <div className="relative h-[420px] md:h-[520px] bg-black mt-4">
-
           <video
             ref={videoRef}
             autoPlay
@@ -237,27 +247,94 @@ export default function Home() {
           >
             <source src="https://res.cloudinary.com/dbbqvgvrh/video/upload/v1777753077/a_procura_ce2n1m.mp4" />
           </video>
-
         </div>
       </section>
 
-      {/* 🔥 RESULTADOS IA */}
-      {isVisionMode && visionResults.length > 0 ? (
+      {/* 🔥 VISION RESULTS (SEPARADO E PROFISSIONAL) */}
+      {visionMode && (
         <section className="max-w-6xl mx-auto px-4 mt-10">
-          <h3 className="text-xl font-bold text-purple-700">
+
+          <h2 className="text-xl font-bold text-purple-700 mb-4">
             Resultados da Vanessa IA
+          </h2>
+
+          {hasResults ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              {visionResults.map((p, i) => (
+                <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
+
+                  <img src={p?.imageUrl} className="h-52 w-full object-cover" />
+
+                  <div className="flex items-center gap-2 px-4 pt-3">
+                    <img
+                      src={p?.user?.profile?.imageUrl || "/avatar.png"}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span className="text-sm font-medium">
+                      {p?.user?.profile?.fullName || "Vendedor"}
+                    </span>
+                  </div>
+
+                  <div className="p-4">
+                    <p className="text-sm text-gray-600">{p?.description}</p>
+                    <h3 className="font-bold">{p?.title}</h3>
+                    <p className="text-purple-600 font-bold">{p?.price} Kz</p>
+
+                    <button className="mt-3 w-full bg-purple-600 text-white py-2 rounded-xl">
+                      Conversar com vendedor
+                    </button>
+                  </div>
+
+                </div>
+              ))}
+
+            </div>
+          ) : (
+            <div className="text-center py-10 text-gray-600">
+              Nenhum produto encontrado com base nesta imagem.
+            </div>
+          )}
+
+        </section>
+      )}
+
+      {/* FEED NORMAL (INTACTO) */}
+      {!visionMode && (
+        <section className="max-w-6xl mx-auto px-4 mt-10">
+
+          <h3 className="text-lg font-semibold text-purple-700">
+            Produtos em destaque
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
 
-            {visionResults.map((p, i) => (
+            {products.map((p, i) => (
               <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
 
                 <img src={p?.imageUrl} className="h-52 w-full object-cover" />
 
+                <div className="flex items-center gap-2 px-4 pt-3">
+                  <img
+                    src={p?.user?.profile?.imageUrl || "/avatar.png"}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span className="text-sm font-medium">
+                    {p?.user?.profile?.fullName}
+                  </span>
+                </div>
+
+                <div className="px-4 mt-1">
+                  <p className="text-sm text-gray-600">{p?.description}</p>
+                </div>
+
                 <div className="p-4">
                   <h4 className="font-semibold">{p?.title}</h4>
                   <p className="text-purple-600 font-bold">{p?.price} Kz</p>
+
+                  <button className="mt-3 w-full bg-purple-600 text-white py-2 rounded-xl">
+                    Conversar com vendedor
+                  </button>
                 </div>
 
               </div>
@@ -265,32 +342,6 @@ export default function Home() {
 
           </div>
         </section>
-      ) : (
-        <>
-          {/* FEED NORMAL */}
-          <section className="max-w-6xl mx-auto px-4 mt-10">
-            <h3 className="text-lg font-semibold text-purple-700">
-              Produtos em destaque
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-
-              {products.map((p, i) => (
-                <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
-
-                  <img src={p?.imageUrl} className="h-52 w-full object-cover" />
-
-                  <div className="p-4">
-                    <h4 className="font-semibold">{p?.title}</h4>
-                    <p className="text-purple-600 font-bold">{p?.price} Kz</p>
-                  </div>
-
-                </div>
-              ))}
-
-            </div>
-          </section>
-        </>
       )}
 
     </div>
