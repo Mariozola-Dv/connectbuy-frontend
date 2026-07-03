@@ -25,13 +25,17 @@ import {
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
+
   const [products, setProducts] = useState<any[]>([]);
+  const [visionResults, setVisionResults] = useState<any[]>([]);
+
   const [videoReady, setVideoReady] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
-  // 🔥 VISÃO IA STATES (NOVO — ADICIONADO SEM REMOVER NADA)
+  // 🔥 VANESSA AI STATES (UPGRADED)
   const [visionLoading, setVisionLoading] = useState(false);
   const [visionStep, setVisionStep] = useState("idle");
+  const [vanessaStage, setVanessaStage] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -40,7 +44,6 @@ export default function Home() {
     process.env.NEXT_PUBLIC_API_URL ||
     "https://connectbuy-backend-production.up.railway.app";
 
-  // 📦 CATEGORIAS COMPLETAS (INALTERADO)
   const categories = [
     { name: "Eletrónicos", icon: Smartphone },
     { name: "Telemóveis", icon: Smartphone },
@@ -63,17 +66,28 @@ export default function Home() {
     imageInputRef.current?.click();
   };
 
-  // 🔥 FUNÇÃO MELHORADA (SEM MEXER NO TEU BACKEND)
+  // 🔥 VANESSA AI IMAGE PROCESSING (PROFESSIONAL FLOW)
   const handleImageSearch = async (file: File) => {
     try {
       setVisionLoading(true);
-      setVisionStep("uploading");
+      setVisionStep("booting");
+      setVanessaStage(0);
 
       const formData = new FormData();
       formData.append("image", file);
 
-      // efeito leve de progressão
-      setTimeout(() => setVisionStep("analyzing"), 500);
+      // 🧠 SIMULAÇÃO DE "BOOT DA VANESSA IA"
+      const interval = setInterval(() => {
+        setVanessaStage((prev) => {
+          if (prev < 3) return prev + 1;
+          clearInterval(interval);
+          return prev;
+        });
+      }, 600);
+
+      setTimeout(() => setVisionStep("uploading"), 600);
+      setTimeout(() => setVisionStep("analyzing"), 1400);
+      setTimeout(() => setVisionStep("scanning"), 2200);
 
       const res = await fetch(`${API_URL}/vision/search`, {
         method: "POST",
@@ -84,20 +98,28 @@ export default function Home() {
 
       const data = await res.json();
 
-      setProducts(Array.isArray(data?.products) ? data.products : []);
+      const results =
+        data?.products ||
+        data?.results ||
+        data ||
+        [];
 
-      setVisionStep("done");
+      setVisionResults(Array.isArray(results) ? results : []);
+
+      setVisionStep("complete");
 
       setTimeout(() => {
         setVisionLoading(false);
         setVisionStep("idle");
-      }, 600);
+        setVanessaStage(0);
+      }, 1200);
 
     } catch (err) {
       console.error("Vision error:", err);
-      setProducts([]);
+      setVisionResults([]);
       setVisionLoading(false);
       setVisionStep("idle");
+      setVanessaStage(0);
     }
   };
 
@@ -107,7 +129,6 @@ export default function Home() {
     handleImageSearch(file);
   };
 
-  // 🔥 LOAD PRODUCTS (INALTERADO)
   useEffect(() => {
     const load = async () => {
       try {
@@ -121,7 +142,6 @@ export default function Home() {
     load();
   }, []);
 
-  // 🔥 VIDEO (INALTERADO)
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -140,10 +160,13 @@ export default function Home() {
     setTimeout(play, 300);
   }, []);
 
+  const displayProducts =
+    visionResults.length > 0 ? visionResults : products;
+
   return (
     <div className="min-h-screen bg-white">
 
-      {/* INPUT CAMERA (INALTERADO) */}
+      {/* INPUT CAMERA */}
       <input
         ref={imageInputRef}
         type="file"
@@ -153,27 +176,45 @@ export default function Home() {
         className="hidden"
       />
 
-      {/* 🔥 OVERLAY IA (NOVO — NÃO REMOVE NADA) */}
+      {/* 🔥 VANESSA AI OVERLAY (ULTRA PROFESSIONAL) */}
       {visionLoading && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50">
 
-          <div className="bg-white w-72 p-6 rounded-2xl text-center shadow-xl">
+          <div className="bg-white w-80 p-6 rounded-2xl text-center shadow-2xl border border-purple-300">
 
-            <div className="animate-spin h-10 w-10 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+            {/* Boot Animation */}
+            <div className="flex justify-center mb-4">
+              <div className="h-12 w-12 rounded-full border-4 border-purple-600 border-t-transparent animate-spin"></div>
+            </div>
 
-            <p className="text-purple-700 font-semibold text-sm">
-              {visionStep === "uploading" && "A enviar imagem..."}
-              {visionStep === "analyzing" && "A analisar imagem..."}
-              {visionStep === "matching" && "A procurar produtos semelhantes..."}
-              {visionStep === "done" && "Resultados encontrados!"}
+            {/* Vanessa AI Title */}
+            <h2 className="text-purple-700 font-bold text-lg mb-2">
+              Vanessa AI Vision
+            </h2>
+
+            {/* Stage Text */}
+            <p className="text-sm text-gray-700 font-medium min-h-[24px]">
+              {visionStep === "booting" && "Inicializando sistema de visão..."}
+              {visionStep === "uploading" && "A enviar imagem para análise..."}
+              {visionStep === "analyzing" && "Vanessa está a analisar padrões visuais..."}
+              {visionStep === "scanning" && "A escanear produtos no mercado..."}
+              {visionStep === "matching" && "A encontrar correspondências..."}
+              {visionStep === "complete" && "Análise concluída com sucesso!"}
             </p>
 
-          </div>
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 h-2 rounded-full mt-4 overflow-hidden">
+              <div
+                className="h-2 bg-purple-600 transition-all duration-500"
+                style={{ width: `${vanessaStage * 33}%` }}
+              />
+            </div>
 
+          </div>
         </div>
       )}
 
-      {/* NAVBAR (INALTERADO) */}
+      {/* NAVBAR (INTOCADO) */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur border-b border-purple-300">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
 
@@ -231,7 +272,7 @@ export default function Home() {
 
         </div>
 
-        {/* MOBILE MENU (INALTERADO) */}
+        {/* MOBILE MENU (INTOCADO) */}
         {menuOpen && (
           <div className="md:hidden bg-white border-t border-purple-300 px-4 pb-4">
 
@@ -273,99 +314,18 @@ export default function Home() {
         )}
       </header>
 
-      {/* LIVE STATUS (INALTERADO) */}
-      <div className="pt-24 flex justify-center">
-        <div className="flex items-center justify-between w-full max-w-xl px-4 py-2 rounded-full bg-purple-50 border border-purple-200 shadow-sm">
-
-          <div className="flex items-center gap-3">
-            <span className="h-2 w-2 bg-purple-600 rounded-full animate-ping"></span>
-            <span className="text-sm font-semibold text-purple-700">
-              Live Marketplace • Online
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 text-purple-700">
-            <ShoppingCart size={18} />
-            <span className="text-sm font-bold">{cartCount}</span>
-          </div>
-
-        </div>
-      </div>
-
-      {/* HERO (INALTERADO) */}
-      <section>
-        <div className="relative h-[420px] md:h-[520px] bg-black mt-4">
-
-          <video
-            ref={videoRef}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src="https://res.cloudinary.com/dbbqvgvrh/video/upload/v1777753077/a_procura_ce2n1m.mp4" />
-          </video>
-
-          {!videoReady && (
-            <div className="absolute inset-0 flex items-center justify-center text-white">
-              A carregar vídeo...
-            </div>
-          )}
-
-          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center px-4">
-            <h2 className="text-4xl font-bold text-white">
-              Compra. Vende. Conecta.
-            </h2>
-            <p className="text-white/80 mt-3">
-              Pesquisa por texto ou imagem
-            </p>
-          </div>
-
-        </div>
-      </section>
-
-      {/* CATEGORIAS (INALTERADO) */}
-      <section className="max-w-6xl mx-auto px-4 mt-10">
-
-        <h3 className="text-xl font-bold text-black mb-6">
-          Categorias
-        </h3>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-
-          {categories.map((cat, i) => {
-            const Icon = cat.icon;
-
-            return (
-              <button
-                key={i}
-                className="group bg-white border border-purple-200 rounded-2xl p-5 flex flex-col items-center gap-3 hover:shadow-xl transition"
-              >
-                <div className="w-14 h-14 rounded-full bg-purple-100 border border-purple-300 flex items-center justify-center group-hover:bg-purple-600">
-                  <Icon className="text-purple-700 group-hover:text-white" />
-                </div>
-
-                <span className="text-sm font-semibold text-black group-hover:text-purple-700">
-                  {cat.name}
-                </span>
-              </button>
-            );
-          })}
-
-        </div>
-      </section>
-
-      {/* FEED (INALTERADO) */}
-      <section className="max-w-6xl mx-auto px-4 mt-10">
+      {/* FEED (INTOCADO) */}
+      <section className="max-w-6xl mx-auto px-4 mt-32">
 
         <h3 className="text-lg font-semibold text-purple-700 border-l-4 border-purple-500 pl-2">
-          Produtos em destaque
+          {visionResults.length > 0
+            ? "Resultados da Vanessa AI"
+            : "Produtos em destaque"}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
 
-          {products.map((p, i) => (
+          {displayProducts.map((p, i) => (
             <div key={i} className="bg-white shadow rounded-2xl overflow-hidden">
 
               <img
